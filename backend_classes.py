@@ -2,6 +2,10 @@ import _sqlite3
 import datetime
 
 class Product:
+    """Contains attributes: product_id, name, base_price, description, category, quantity_in_stock, image_url,
+    date_added, price.
+    And methods: purchase_increment_stock, calculate_discounted_price, apply_discount, add_tags,get_similar_products,
+    get_reviews, add_product_to_list, change_product_info."""
 
     def __init__(self, product_id, name, base_price, description, category, quantity_in_stock, image_url):
         self.product_id = product_id
@@ -36,13 +40,6 @@ class Product:
     def change_product_info(self, new_input):
         #Add a method to the Product class that changes the information of a product.
 
-
-
-
-
-
-
-
 class ProductBook(Product):
     """Inherits from Product. Contains attributes: media_type, author, synopsis, genre, language, publisher, edition,
     ISBN, illustrations, series_id, position_in_series.
@@ -59,14 +56,29 @@ class ProductPhysicalBook(ProductBook):
     """Inherits from ProductBook. Contains attributes: product_condition, product_format, shipping_date.
     And methods: get_delivery_date"""
 
-
 class Review:
     """Contains attributes: review_id, account_id, product_id, review_text, review_rating, review_date.
     And methods: edit_review, delete_review, report_review"""
 
+    def __init__(self, account_id, product_id, review_text, review_rating):
+        self.account_id = account_id
+        self.product_id = product_id
+        self.review_text = review_text
+        self.review_rating = review_rating
+        self.review_date = datetime.datetime.now()
+        self.review_id = self.account_id + self.product_id
 class ProductList:
     """Contains attributes: product_list_id, product_list_type, product_list_name, product_list_description,
-    product_ids, account_ids. And methods: add_product, remove_product, delete_product_list"""
+    product_ids, account_id.
+    And methods: add_product, remove_product, delete_product_list"""
+
+    def __init__(self, product_list_type, product_list_name, product_list_description, account_id ):
+        self.product_list_id =
+        self.product_list_type = product_list_type
+        self.product_list_name = product_list_name
+        self.product_list_description = product_list_description
+        self.product_ids = []
+        self.account_id = account_id
 
 class Basket(ProductList):
     """Inherits from ProductList. Contains method: purchase_basket"""
