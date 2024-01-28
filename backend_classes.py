@@ -1,6 +1,6 @@
-import _sqlite3
 import datetime
-
+import os
+os.system("SQLite initialisation.py")
 class Product:
     """Contains attributes: product_id, product_name, product_base_price, product_description, product_category,
     product_quantity_in_stock, product_image_url,product_date_added, product_price.
@@ -31,14 +31,14 @@ class Product:
         self.product_discount = discount
     def add_tags(self, tag):
         self.product_tags.append(tag)
-    def get_similar_products(self):
-        #Add a method to the Product class that returns a list of similar products.
-    def get_reviews(self):
-        #Add a method to the Product class that returns a list of reviews.
-    def add_product_to_list(self):
-        #Add a method to the Product class that adds a product to the list of products.
-    def change_product_info(self, new_input):
-        #Add a method to the Product class that changes the information of a product.
+    # def get_similar_products(self):
+    #     #Add a method to the Product class that returns a list of similar products.
+    # def get_reviews(self):
+    #     #Add a method to the Product class that returns a list of reviews.
+    # def add_product_to_list(self):
+    #     #Add a method to the Product class that adds a product to the list of products.
+    # def change_product_info(self, new_input):
+    #     #Add a method to the Product class that changes the information of a product.
 
 class ProductBook(Product):
     """Inherits from Product. Contains attributes: media_type, author, synopsis, genre, language, publisher, edition,
@@ -73,7 +73,7 @@ class ProductList:
     And methods: add_product, remove_product, delete_product_list"""
 
     def __init__(self, product_list_type, product_list_name, product_list_description, account_id ):
-        self.product_list_id =
+        #self.product_list_id =
         self.product_list_type = product_list_type
         self.product_list_name = product_list_name
         self.product_list_description = product_list_description
