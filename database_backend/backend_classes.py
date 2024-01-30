@@ -16,9 +16,9 @@ class Product:
         self.product_image_url = image_url
         self.product_date_added = datetime.datetime.now()
         self.product_price = self.product_base_price * (1 - self.product_discount)
-        database.ProductTable.add_product(self.product_name, self.product_base_price, self.product_description,\
-                                          self.product_category, self.product_quantity_in_stock,\
-                                          self.product_image_url, self.product_date_added, self.product_price, self.product_quantity_sold,\
+        database.ProductTable.add_product(self.product_name, self.product_base_price, self.product_description, \
+                                          self.product_category, self.product_quantity_in_stock, \
+                                          self.product_image_url, self.product_date_added, self.product_price, self.product_quantity_sold, \
                                           self.product_discount)
 
     product_quantity_sold = 0
