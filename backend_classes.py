@@ -1,14 +1,13 @@
 import datetime
-import os
-os.system("SQLite initialisation.py")
+import database
 class Product:
     """Contains attributes: product_id, product_name, product_base_price, product_description, product_category,
     product_quantity_in_stock, product_image_url,product_date_added, product_price.
     And methods: purchase_increment_stock, calculate_discounted_price, apply_discount, add_tags,get_similar_products,
     get_reviews, add_product_to_list, change_product_info."""
 
-    def __init__(self, product_id, name, base_price, description, category, quantity_in_stock, image_url):
-        self.product_id = product_id
+    def __init__(self, name, base_price, description, category, quantity_in_stock, image_url):
+        self.product_id = database.ProductTable.get_new_id()
         self.product_name = name
         self.product_base_price = base_price
         self.product_description = description
@@ -16,7 +15,11 @@ class Product:
         self.product_quantity_in_stock = quantity_in_stock
         self.product_image_url = image_url
         self.product_date_added = datetime.datetime.now()
-        self.product_price = self.base_price * (1 - self.discount)
+        self.product_price = self.product_base_price * (1 - self.product_discount)
+        database.ProductTable.add_product(self.product_name, self.product_base_price, self.product_description,\
+                                          self.product_category, self.product_quantity_in_stock,\
+                                          self.product_image_url, self.product_date_added, self.product_price, self.product_quantity_sold,\
+                                          self.product_discount)
 
     product_quantity_sold = 0
     product_discount = 0
