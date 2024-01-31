@@ -1,5 +1,7 @@
 import sqlite3
 # The Database class below is an abstract class, acting as a superclass for all database subclasses.
+
+
 class Database:
     def __init__(self, table_name):
         self.connection = sqlite3.connect("../WMGZON.db")
@@ -18,7 +20,7 @@ class Database:
 
     # The update_record method below updates a variable column in a variable record to be a new value
     def update_record(self, id, column_name, new_value):
-        self.cursor.execute("UPDATE " + self.table_name + " SET ? = ? WHERE id = ?",\
+        self.cursor.execute("UPDATE " + self.table_name + " SET ? = ? WHERE id = ?",
                             (column_name, new_value, str(id)))
         self.connection.commit()
 
@@ -44,25 +46,45 @@ class Database:
 
 class ProductDatabase(Database):
     # The init method below calls the superclass init method and creates a product table if one does not already exist.
-    def __init__(self):
-        super().__init__("TEST_PRODUCTS")
+    def __init__(self, table_name):
+        super().__init__(table_name)
         self.cursor.execute("CREATE TABLE IF NOT EXISTS " + self.table_name + " (id INTEGER NOT NULL PRIMARY KEY,\
                product_name VARCHAR(64), base_price FLOAT, product_description CLOB, product_category VARCHAR(64),\
                quantity_in_stock INTEGER, product_image_url CLOB, date_added DATETIME,\
                price FLOAT, quantity_sold INTEGER, product_discount FLOAT)")
 
     # The add_product method below takes product related parameters and stores them in a new row in the product table.
-    def add_product(self, product_name, base_price, product_description, product_category,\
+    def add_product(self, product_name, base_price, product_description, product_category,
                     quantity_in_stock, product_image_url, date_added, price, quantity_sold, product_discount):
-        self.cursor.execute("INSERT INTO " + self.table_name + " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",\
-                            (super().get_new_id(), product_name, base_price, product_description,\
-                             product_category, quantity_in_stock, product_image_url, date_added, price, quantity_sold,\
+        self.cursor.execute("INSERT INTO " + self.table_name + " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                            (super().get_new_id(), product_name, base_price, product_description,
+                             product_category, quantity_in_stock, product_image_url, date_added, price, quantity_sold,
                              product_discount))
         self.connection.commit()
 
 
 
-ProductTable = ProductDatabase()
+class ProductBookDatabase(ProductDatabase):
+    # The init method below calls the Product class init, as well as creating a book table called 'sub_table_name'
+    def __init__(self, table_name, sub_table_name):
+        super().__init__(table_name)
+        self.sub_table_name = sub_table_name
+        self.cursor.execute("CREATE TABLE IF NOT EXISTS " + self.sub_table_name + " (id INTEGER NOT NULL PRIMARY KEY, \
+                            media_type VARCHAR(64), synopsis CLOB, genre VARCHAR(64), language VARCHAR(64), \
+                            publisher VARCHAR(64), edition VARCHAR(64), isbn CHAR(13), illustrations BOOLEAN, \
+                            series_id INTEGER, position_in_series INTEGER)")
+
+    """The add_book method below calls the add_product method to add a new record to the product table, before 
+    adding a new record to the book table with the same id."""
+    def add_book(self, product_name, base_price, product_description, product_category, quantity_in_stock,
+                 product_image_url, date_added, price, quantity_sold, product_discount, media_type, synopsis, genre,
+                 language, publisher, edition, isbn, illustrations, series_id, position_in_series):
+        super().add_product(product_name, base_price, product_description, product_category,
+                    quantity_in_stock, product_image_url, date_added, price, quantity_sold, product_discount)
+        self.cursor.execute("INSERT INTO " + self.sub_table_name + " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                            ((super().get_new_id() - 1), media_type, synopsis, genre, language, publisher,
+                             edition, isbn, illustrations, series_id, position_in_series))
+        self.connection.commit()
 
 
 
@@ -72,3 +94,10 @@ ProductTable = ProductDatabase()
 
 
 
+
+
+
+
+
+
+ProductTable = ProductBookDatabase('TEST_PRODUCT', 'TEST_BOOK')
