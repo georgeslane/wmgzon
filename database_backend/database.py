@@ -4,7 +4,7 @@ import sqlite3
 
 class Database:
     def __init__(self, table_name):
-        self.connection = sqlite3.connect("../WMGZON.db")
+        self.connection = sqlite3.connect("WMGZON.db")
         self.cursor = self.connection.cursor()
         self.table_name = table_name
 
@@ -32,8 +32,9 @@ class Database:
         count_id = self.cursor.execute("SELECT COUNT(*) FROM " + table_name).fetchall()
         cleaned_count_id = ''
         for digit in count_id:
-            cleaned_count_id = cleaned_count_id + str(digit)
-        if cleaned_count_id == '':
+            if digit not in ['(', ')', ',', ' ', '[', ']']:
+                cleaned_count_id = cleaned_count_id + str(digit)
+        if cleaned_count_id == '(0,)':
             return 1
         else:
             max_id = self.cursor.execute("SELECT MAX(id) FROM " + table_name).fetchall()
@@ -46,9 +47,10 @@ class Database:
 
 class ProductDatabase(Database):
     # The init method below calls the superclass init method and creates a product table if one does not already exist.
-    def __init__(self, table_name):
-        super().__init__(table_name)
-        self.cursor.execute("CREATE TABLE IF NOT EXISTS " + self.table_name + " (id INTEGER NOT NULL PRIMARY KEY,\
+    def __init__(self, level_1_table_name):
+        self.level_1_table_name = level_1_table_name
+        super().__init__(level_1_table_name)
+        self.cursor.execute("CREATE TABLE IF NOT EXISTS " + self.level_1_table_name + " (id INTEGER NOT NULL PRIMARY KEY,\
                product_name VARCHAR(64), base_price FLOAT, product_description CLOB, product_category VARCHAR(64),\
                quantity_in_stock INTEGER, product_image_url CLOB, date_added DATETIME,\
                price FLOAT, quantity_sold INTEGER, product_discount FLOAT)")
@@ -57,8 +59,8 @@ class ProductDatabase(Database):
     # The add_product method below takes product related parameters and stores them in a new row in the product table.
     def add_product(self, product_name, base_price, product_description, product_category,
                     quantity_in_stock, product_image_url, date_added, price, quantity_sold, product_discount):
-        self.cursor.execute("INSERT INTO " + self.table_name + " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                            (super().get_new_id(self.table_name), product_name, base_price,
+        self.cursor.execute("INSERT INTO " + self.level_1_table_name + " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                            (super().get_new_id(self.level_1_table_name), product_name, base_price,
                              product_description, product_category, quantity_in_stock, product_image_url, date_added,
                              price, quantity_sold, product_discount))
         self.connection.commit()
@@ -66,11 +68,11 @@ class ProductDatabase(Database):
 
 class ProductBookDatabase(ProductDatabase):
     # The init method below calls the Product class init, as well as creating a book table called 'sub_table_name'
-    def __init__(self, parent_table_name, table_name):
-        super().__init__(parent_table_name)
-        self.parent_table_name = parent_table_name
-        self.table_name = table_name
-        self.cursor.execute("CREATE TABLE IF NOT EXISTS " + self.table_name + " (id INTEGER NOT NULL PRIMARY KEY, \
+    def __init__(self, level_1_table_name, level_2_table_name):
+        super().__init__(level_1_table_name)
+        self.level_1_table_name = level_1_table_name
+        self.level_2_table_name = level_2_table_name
+        self.cursor.execute("CREATE TABLE IF NOT EXISTS " + self.level_2_table_name + " (id INTEGER NOT NULL PRIMARY KEY, \
                             media_type VARCHAR(64), synopsis CLOB, genre VARCHAR(64), language VARCHAR(64), \
                             publisher VARCHAR(64), edition VARCHAR(64), isbn CHAR(13), illustrations BOOLEAN, \
                             series_id INTEGER, position_in_series INTEGER)")
@@ -83,14 +85,18 @@ class ProductBookDatabase(ProductDatabase):
                  language, publisher, edition, isbn, illustrations, series_id, position_in_series):
         super().add_product(product_name, base_price, product_description, product_category,
                             quantity_in_stock, product_image_url, date_added, price, quantity_sold, product_discount)
-        self.cursor.execute("INSERT INTO " + self.table_name + " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                            ((super().get_new_id(self.parent_table_name) - 1), media_type, synopsis, genre,
+        self.cursor.execute("INSERT INTO " + self.level_2_table_name + " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                            ((super().get_new_id(self.level_1_table_name) - 1), media_type, synopsis, genre,
                              language, publisher, edition, isbn, illustrations, series_id, position_in_series))
         self.connection.commit()
 
     def get_record(self, id):
-        super().get_record(id)
-        self.get_record(id)
+        self.cursor.execute("SELECT * FROM " + self.level_1_table_name + " INNER JOIN\
+         " + self.level_2_table_name + " ON " + self.level_1_table_name + ".id=\
+         " + self.level_2_table_name + ".id  WHERE " + self.level_1_table_name + ".id = ?", (str(id)))
+        return self.cursor.fetchall()
+
+
 
     def delete_record(self, id):
         super().delete_record(id)
@@ -99,12 +105,12 @@ class ProductBookDatabase(ProductDatabase):
 
 class ProductDigitalBookDatabase(ProductBookDatabase):
 
-    def __init__(self, parent_parent_table_name, parent_table_name, table_name):
-        super().__init__(parent_parent_table_name, parent_table_name)
-        self.table_name = table_name
-        self.parent_table_name = parent_table_name
-        self.parent_parent_table_name = parent_parent_table_name
-        self.cursor.execute("CREATE TABLE IF NOT EXISTS " + self.table_name + " (id INTEGER NOT NULL\
+    def __init__(self, level_1_table_name, level_2_table_name, level_3_table_name):
+        super().__init__(level_1_table_name, level_2_table_name)
+        self.level_3_table_name = level_3_table_name
+        self.level_2_table_name = level_2_table_name
+        self.level_1_table_name = level_1_table_name
+        self.cursor.execute("CREATE TABLE IF NOT EXISTS " + self.level_3_table_name + " (id INTEGER NOT NULL\
                             PRIMARY KEY, length INTEGER, narrator VARCHAR(64), dramatised BOOLEAN,\
                             file_format VARCHAR(64), storage_size FLOAT)")
         self.connection.commit()
@@ -116,14 +122,18 @@ class ProductDigitalBookDatabase(ProductBookDatabase):
         super().add_book(product_name, base_price, product_description, product_category, quantity_in_stock,
                          product_image_url, date_added, price, quantity_sold, product_discount, media_type, synopsis,
                          genre, language, publisher, edition, isbn, illustrations, series_id, position_in_series)
-        self.cursor.execute("INSERT INTO " + self.table_name + " VALUES (?, ?, ?, ?, ?, ?)",
-                            ((super().get_new_id(self.parent_parent_table_name) - 1), length, narrator,
+        self.cursor.execute("INSERT INTO " + self.level_3_table_name + " VALUES (?, ?, ?, ?, ?, ?)",
+                            ((super().get_new_id(self.level_1_table_name) - 1), length, narrator,
                              dramatised, file_format, storage_size))
         self.connection.commit()
 
     def get_record(self, id):
-        super().get_record(id)
-        self.get_record(id)
+        self.cursor.execute("SELECT * FROM " + self.level_1_table_name + " INNER JOIN\
+         " + self.level_2_table_name + " ON " + self.level_1_table_name + ".id=\
+         " + self.level_2_table_name + ".id INNER JOIN " + self.level_3_table_name + " ON " + self.level_1_table_name \
+         + ".id=" + self.level_3_table_name + ".id  WHERE " + self.level_1_table_name + ".id = ?", (str(id)))
+        return self.cursor.fetchall()
+
 
     def delete_record(self, id):
         super().delete_record(id)
@@ -132,35 +142,39 @@ class ProductDigitalBookDatabase(ProductBookDatabase):
 
 class ProductPhysicalBookDatabase(ProductBookDatabase):
 
-    def __init__(self, parent_parent_table_name, parent_table_name, table_name):
-        super().__init__(parent_parent_table_name, parent_table_name)
-        self.table_name = table_name
-        self.parent_table_name = parent_table_name
-        self.parent_parent_table_name = parent_parent_table_name
-        self.cursor.execute("CREATE TABLE IF NOT EXISTS " + self.table_name + " (id INTEGER NOT NULL\
+    def __init__(self, level_1_table_name, level_2_table_name, level_3_table_name):
+        super().__init__(level_1_table_name, level_2_table_name)
+        self.level_3_table_name = level_3_table_name
+        self.level_2_table_name = level_2_table_name
+        self.level_1_table_name = level_1_table_name
+        self.cursor.execute("CREATE TABLE IF NOT EXISTS " + self.level_3_table_name + " (id INTEGER NOT NULL\
                             PRIMARY KEY, product_condition VARCHAR(16), product_format VARCHAR(32),\
                             shipping_time INTEGER)")
         self.connection.commit()
 
-    def add_digital_book(self, product_name, base_price, product_description, product_category, quantity_in_stock,
+    def add_physical_book(self, product_name, base_price, product_description, product_category, quantity_in_stock,
                          product_image_url, date_added, price, quantity_sold, product_discount, media_type, synopsis,
                          genre, language, publisher, edition, isbn, illustrations, series_id, position_in_series,
                          product_condition, product_format, shipping_time):
         super().add_book(product_name, base_price, product_description, product_category, quantity_in_stock,
                          product_image_url, date_added, price, quantity_sold, product_discount, media_type, synopsis,
                          genre, language, publisher, edition, isbn, illustrations, series_id, position_in_series)
-        self.cursor.execute("INSERT INTO " + self.table_name + " VALUES (?, ?, ?, ?)",
-                            ((super().get_new_id(self.parent_parent_table_name) - 1), product_condition,
+        self.cursor.execute("INSERT INTO " + self.level_3_table_name + " VALUES (?, ?, ?, ?)",
+                            ((super().get_new_id(self.level_1_table_name) - 1), product_condition,
                              product_format, shipping_time))
         self.connection.commit()
 
     def get_record(self, id):
-        super().get_record(id)
-        self.get_record(id)
+        self.cursor.execute("SELECT * FROM " + self.level_1_table_name + " INNER JOIN " \
+                            + self.level_2_table_name + " ON " + self.level_1_table_name + ".id=\
+                            " + self.level_2_table_name + ".id INNER JOIN " + self.level_3_table_name + " ON " + self.level_1_table_name \
+                            + ".id=" + self.level_3_table_name + ".id  WHERE " + self.level_1_table_name + ".id = ?", (str(id)))
+        return self.cursor.fetchall()
 
-    def delete_record(self, id):
-        super().delete_record(id)
-        self.delete_record(id)
+
+    def delete_record(self, id, table_name):
+        super().delete_record(id, self.level_2_table_name)
+        self.delete_record(id, table_name)
 
 
 class AccountDatabase(Database):
@@ -204,4 +218,7 @@ class AccountDatabase(Database):
 
 
 
-# ProductTable = ProductBookDatabase('TEST_PRODUCT', 'TEST_BOOK') 
+TEST_PRODUCT = ProductDatabase('TEST_PRODUCT')
+TEST_PRODUCT_BOOK = ProductBookDatabase('TEST_PRODUCT', 'TEST_PRODUCT_BOOK')
+TEST_PRODUCT_DIGITAL_BOOK = ProductDigitalBookDatabase('TEST_PRODUCT', 'TEST_PRODUCT_BOOK', 'TEST_PRODUCT_DIGITAL_BOOK')
+TEST_PRODUCT_PHYSICAL_BOOK = ProductPhysicalBookDatabase('TEST_PRODUCT', 'TEST_PRODUCT_BOOK', 'TEST_PRODUCT_PHYSICAL_BOOK')
