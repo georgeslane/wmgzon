@@ -52,6 +52,7 @@ class ProductDatabase(Database):
                product_name VARCHAR(64), base_price FLOAT, product_description CLOB, product_category VARCHAR(64),\
                quantity_in_stock INTEGER, product_image_url CLOB, date_added DATETIME,\
                price FLOAT, quantity_sold INTEGER, product_discount FLOAT)")
+        self.connection.commit()
 
     # The add_product method below takes product related parameters and stores them in a new row in the product table.
     def add_product(self, product_name, base_price, product_description, product_category,
@@ -72,6 +73,7 @@ class ProductBookDatabase(ProductDatabase):
                             media_type VARCHAR(64), synopsis CLOB, genre VARCHAR(64), language VARCHAR(64), \
                             publisher VARCHAR(64), edition VARCHAR(64), isbn CHAR(13), illustrations BOOLEAN, \
                             series_id INTEGER, position_in_series INTEGER)")
+        self.connection.commit()
 
     """The add_book method below calls the add_product method to add a new record to the product table, before 
     adding a new record to the book table with the same id."""
@@ -94,6 +96,7 @@ class ProductDigitalBookDatabase(ProductBookDatabase):
         self.cursor.execute("CREATE TABLE IF NOT EXISTS " + self.sub_sub_table_name + " (id INTEGER NOT NULL\
                             PRIMARY KEY, length INTEGER, narrator VARCHAR(64), dramatised BOOLEAN,\
                             file_format VARCHAR(64), storage_size FLOAT)")
+        self.connection.commit()
 
     def add_digital_book(self, product_name, base_price, product_description, product_category, quantity_in_stock,
                          product_image_url, date_added, price, quantity_sold, product_discount, media_type, synopsis,
@@ -116,6 +119,7 @@ class ProductPhysicalBookDatabase(ProductBookDatabase):
         self.cursor.execute("CREATE TABLE IF NOT EXISTS " + self.sub_sub_table_name + " (id INTEGER NOT NULL\
                             PRIMARY KEY, product_condition VARCHAR(16), product_format VARCHAR(32),\
                             shipping_time INTEGER)")
+        self.connection.commit()
 
     def add_digital_book(self, product_name, base_price, product_description, product_category, quantity_in_stock,
                          product_image_url, date_added, price, quantity_sold, product_discount, media_type, synopsis,
@@ -129,4 +133,42 @@ class ProductPhysicalBookDatabase(ProductBookDatabase):
         self.connection.commit()
 
 
-ProductTable = ProductBookDatabase('TEST_PRODUCT', 'TEST_BOOK')
+class AccountDatabase(Database):
+    def __init__(self, table_name):
+        super().__init__(table_name)
+        self.cursor.execute("CREATE TABLE IF NOT EXISTS " + self.table_name + " (id INTEGER NOT NULL PRIMARY KEY, username VARCHAR(64) MOT NULL, email VARCHAR(64), permission_id VARCHAR(16)) NOT NULL")
+        self.connection.commit()
+
+    def add_account(self, username, email, permission_id):
+        self.cursor.execute("INSERT INTO TABLE " + self.table_name + " VALUES (?, ?, ?, ?)", (super().get_new_id(), username, email, permission_id))
+        self.connection.commit()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# ProductTable = ProductBookDatabase('TEST_PRODUCT', 'TEST_BOOK') 
