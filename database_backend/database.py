@@ -63,7 +63,6 @@ class ProductDatabase(Database):
         self.connection.commit()
 
 
-
 class ProductBookDatabase(ProductDatabase):
     # The init method below calls the Product class init, as well as creating a book table called 'sub_table_name'
     def __init__(self, table_name, sub_table_name):
@@ -80,24 +79,54 @@ class ProductBookDatabase(ProductDatabase):
                  product_image_url, date_added, price, quantity_sold, product_discount, media_type, synopsis, genre,
                  language, publisher, edition, isbn, illustrations, series_id, position_in_series):
         super().add_product(product_name, base_price, product_description, product_category,
-                    quantity_in_stock, product_image_url, date_added, price, quantity_sold, product_discount)
+                            quantity_in_stock, product_image_url, date_added, price, quantity_sold, product_discount)
         self.cursor.execute("INSERT INTO " + self.sub_table_name + " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                             ((super().get_new_id() - 1), media_type, synopsis, genre, language, publisher,
                              edition, isbn, illustrations, series_id, position_in_series))
         self.connection.commit()
 
 
+class ProductDigitalBookDatabase(ProductBookDatabase):
+
+    def __init__(self, table_name, sub_table_name, sub_sub_table_name):
+        super().__init__(table_name, sub_table_name)
+        self.sub_sub_table_name = sub_sub_table_name
+        self.cursor.execute("CREATE TABLE IF NOT EXISTS " + self.sub_sub_table_name + " (id INTEGER NOT NULL\
+                            PRIMARY KEY, length INTEGER, narrator VARCHAR(64), dramatised BOOLEAN,\
+                            file_format VARCHAR(64), storage_size FLOAT)")
+
+    def add_digital_book(self, product_name, base_price, product_description, product_category, quantity_in_stock,
+                         product_image_url, date_added, price, quantity_sold, product_discount, media_type, synopsis,
+                         genre, language, publisher, edition, isbn, illustrations, series_id, position_in_series,
+                         length, narrator, dramatised, file_format, storage_size):
+        super().add_book(product_name, base_price, product_description, product_category, quantity_in_stock,
+                         product_image_url, date_added, price, quantity_sold, product_discount, media_type, synopsis,
+                         genre, language, publisher, edition, isbn, illustrations, series_id, position_in_series)
+        self.cursor.execute("INSERT INTO " + self.sub_sub_table_name + " VALUES (?, ?, ?, ?, ?, ?)",
+                            ((super().get_new_id() - 1), length, narrator, dramatised, file_format,
+                             storage_size))
+        self.connection.commit()
 
 
+class ProductPhysicalBookDatabase(ProductBookDatabase):
 
+    def __init__(self, table_name, sub_table_name, sub_sub_table_name):
+        super().__init__(table_name, sub_table_name)
+        self.sub_sub_table_name = sub_sub_table_name
+        self.cursor.execute("CREATE TABLE IF NOT EXISTS " + self.sub_sub_table_name + " (id INTEGER NOT NULL\
+                            PRIMARY KEY, product_condition VARCHAR(16), product_format VARCHAR(32),\
+                            shipping_time INTEGER)")
 
-
-
-
-
-
-
-
+    def add_digital_book(self, product_name, base_price, product_description, product_category, quantity_in_stock,
+                         product_image_url, date_added, price, quantity_sold, product_discount, media_type, synopsis,
+                         genre, language, publisher, edition, isbn, illustrations, series_id, position_in_series,
+                         product_condition, product_format, shipping_time):
+        super().add_book(product_name, base_price, product_description, product_category, quantity_in_stock,
+                         product_image_url, date_added, price, quantity_sold, product_discount, media_type, synopsis,
+                         genre, language, publisher, edition, isbn, illustrations, series_id, position_in_series)
+        self.cursor.execute("INSERT INTO " + self.sub_sub_table_name + " VALUES (?, ?, ?, ?)",
+                            ((super().get_new_id() - 1), product_condition, product_format, shipping_time))
+        self.connection.commit()
 
 
 ProductTable = ProductBookDatabase('TEST_PRODUCT', 'TEST_BOOK')
