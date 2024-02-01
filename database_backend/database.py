@@ -1,4 +1,5 @@
 import sqlite3
+from utils import database_utils
 # The Database class below is an abstract class, acting as a superclass for all database subclasses.
 
 
@@ -7,22 +8,26 @@ class Database:
         self.connection = sqlite3.connect("WMGZON.db")
         self.cursor = self.connection.cursor()
         self.table_name = table_name
+        self.sql_reader = database_utils.SqliteReader()
 
     # The get_record method below takes an id (unique primary key) as an argument and returns the associated record
     def get_record(self, id):
-        self.cursor.execute("SELECT * FROM " + self.table_name + " WHERE id = ?", (str(id)))
+        self.cursor.execute("SELECT * FROM " + self.table_name + " WHERE id = ?", (self.sql_reader.convert_to_tuple(id)))
         return self.cursor.fetchall()
 
     # The delete_record method below takes a unique id as an argument and deletes the associated record
     def delete_record(self, id):
-        self.cursor.execute("DELETE FROM " + self.table_name + " WHERE id = ?", (str(id)))
+        self.cursor.execute("DELETE FROM " + self.table_name + " WHERE id = ?", self.sql_reader.convert_to_tuple(id))
         self.connection.commit()
 
     # The update_record method below updates a variable column in a variable record to be a new value
     def update_record(self, id, column_name, new_value):
-        self.cursor.execute("UPDATE " + self.table_name + " SET ? = ? WHERE id = ?",
-                            (column_name, new_value, str(id)))
-        self.connection.commit()
+        if column_name == 'id':
+            raise Exception('Cannot change the id of a record')
+        else:
+            self.cursor.execute("UPDATE " + self.table_name + " SET ? = ? WHERE id = ?",
+                                (column_name, new_value, self.sql_reader.convert_to_tuple(id)))
+            self.connection.commit()
 
     """The get_new_id function below is called when creating a new record in a table. It first checks how many records 
     are in that table. If there are 0 records, the new record is assigned an id of 1. If there are already records in
@@ -93,14 +98,13 @@ class ProductBookDatabase(ProductDatabase):
     def get_record(self, id):
         self.cursor.execute("SELECT * FROM " + self.level_1_table_name + " INNER JOIN\
          " + self.level_2_table_name + " ON " + self.level_1_table_name + ".id=\
-         " + self.level_2_table_name + ".id  WHERE " + self.level_1_table_name + ".id = ?", (str(id)))
+         " + self.level_2_table_name + ".id  WHERE " + self.level_1_table_name + ".id = ?", (self.sql_reader.convert_to_tuple(id)))
         return self.cursor.fetchall()
 
-
-
     def delete_record(self, id):
-        super().delete_record(id)
-        self.delete_record(id)
+        self.cursor.execute("DELETE FROM " + self.level_1_table_name + " WHERE id = ?", self.sql_reader.convert_to_tuple(id))
+        self.cursor.execute("DELETE FROM " + self.level_2_table_name + " WHERE id = ?", self.sql_reader.convert_to_tuple(id))
+        self.connection.commit()
 
 
 class ProductDigitalBookDatabase(ProductBookDatabase):
@@ -131,13 +135,14 @@ class ProductDigitalBookDatabase(ProductBookDatabase):
         self.cursor.execute("SELECT * FROM " + self.level_1_table_name + " INNER JOIN\
          " + self.level_2_table_name + " ON " + self.level_1_table_name + ".id=\
          " + self.level_2_table_name + ".id INNER JOIN " + self.level_3_table_name + " ON " + self.level_1_table_name \
-         + ".id=" + self.level_3_table_name + ".id  WHERE " + self.level_1_table_name + ".id = ?", (str(id)))
+                            + ".id=" + self.level_3_table_name + ".id  WHERE " + self.level_1_table_name + ".id = ?", (self.sql_reader.convert_to_tuple(id)))
         return self.cursor.fetchall()
 
-
     def delete_record(self, id):
-        super().delete_record(id)
-        self.delete_record(id)
+        self.cursor.execute("DELETE FROM " + self.level_1_table_name + " WHERE id = ?", self.sql_reader.convert_to_tuple(id))
+        self.cursor.execute("DELETE FROM " + self.level_2_table_name + " WHERE id = ?", self.sql_reader.convert_to_tuple(id))
+        self.cursor.execute("DELETE FROM " + self.level_3_table_name + " WHERE id = ?", self.sql_reader.convert_to_tuple(id))
+        self.connection.commit()
 
 
 class ProductPhysicalBookDatabase(ProductBookDatabase):
@@ -168,26 +173,34 @@ class ProductPhysicalBookDatabase(ProductBookDatabase):
         self.cursor.execute("SELECT * FROM " + self.level_1_table_name + " INNER JOIN " \
                             + self.level_2_table_name + " ON " + self.level_1_table_name + ".id=\
                             " + self.level_2_table_name + ".id INNER JOIN " + self.level_3_table_name + " ON " + self.level_1_table_name \
-                            + ".id=" + self.level_3_table_name + ".id  WHERE " + self.level_1_table_name + ".id = ?", (str(id)))
+                            + ".id=" + self.level_3_table_name + ".id  WHERE " + self.level_1_table_name + ".id = ?", (self.sql_reader.convert_to_tuple(id)))
         return self.cursor.fetchall()
 
 
-    def delete_record(self, id, table_name):
-        super().delete_record(id, self.level_2_table_name)
-        self.delete_record(id, table_name)
+    def delete_record(self, id):
+        self.cursor.execute("DELETE FROM " + self.level_1_table_name + " WHERE id = ?", self.sql_reader.convert_to_tuple(id))
+        self.cursor.execute("DELETE FROM " + self.level_2_table_name + " WHERE id = ?", self.sql_reader.convert_to_tuple(id))
+        self.cursor.execute("DELETE FROM " + self.level_3_table_name + " WHERE id = ?", self.sql_reader.convert_to_tuple(id))
+        self.connection.commit()
 
 
 class AccountDatabase(Database):
-    def __init__(self, table_name):
-        self.table_name = table_name
-        super().__init__(table_name)
+    def __init__(self, account_table_name, password_table_name):
+        self.account_table_name = account_table_name
+        self.password_table_name = password_table_name
+        super().__init__(account_table_name)
         self.cursor.execute("CREATE TABLE IF NOT EXISTS " + self.table_name + " (id INTEGER NOT NULL PRIMARY KEY,\
-                            username VARCHAR(64) MOT NULL, email VARCHAR(64), permission_id VARCHAR(16)) NOT NULL")
+                            username UNIQUE VARCHAR(64) NOT NULL, email VARCHAR(64), permission_id VARCHAR(16)) NOT NULL")
+        self.cursor.execute("CREATE TABLE IF NOT EXISTS " + self.password_table_name + "\
+         (id INTEGER NOT NULL PRIMARY KEY, hashed_passwords VARCHAR(64) NOT NULL)")
         self.connection.commit()
+        self.account_security = database_utils.AccountSecurity()
 
-    def add_account(self, username, email, permission_id):
+    def add_account(self, username, email, permission_id, password):
         self.cursor.execute("INSERT INTO " + self.table_name + " VALUES (?, ?, ?, ?)",
-                            (super().get_new_id(self.table_name), username, email, permission_id))
+                            (super().get_new_id(self.account_table_name), username, email, permission_id))
+        self.cursor.execute("INSERT INTO " + self.password_table_name + " VALUES (?, ?)",
+                            (super().get_new_id(self.account_table_name) - 1, self.account_security.hash_password(password, str(super().get_new_id(self.account_table_name) - 1))))
         self.connection.commit()
 
 
