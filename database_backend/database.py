@@ -291,6 +291,51 @@ class AccountDatabase(Database):
             return False
 
 
+class PaymentMethodDatabase(Database):
+
+    """The init method below stores the payment table name as an attribute, before calling the superclass
+    initialisation method on the payment table name, and then creates a new payment table if one does not exist,
+    with attributes: id, account_id, card_number, security_code, card_holder_name, expiry_date, billing_address
+    and bank_name."""
+    def __init__(self, payment_table_name):
+        self.payment_table_name = payment_table_name
+        super().__init__(payment_table_name)
+        self.cursor.execute("CREATE TABLE IF NOT EXISTS " + self.payment_table_name + " (id INTEGER NOT NULL \
+        PRIMARY KEY, account_id INTEGER NOT NULL, card_number CHAR(16) NOT NULL, security_code CHAR(3) NOT NULL, \
+        card_holder_name VARCHAR(64) NOT NULL, expiry_date DATE NOT NULL, billing_address CLOB NOT NULL, bank_name \
+        VARCHAR(64) NOT NULL)")
+        self.connection.commit()
+
+    """The add_payment method below inserts a new record into the payment table when called."""
+    def add_payment_method(self, account_id, card_number, security_code, card_holder_name, expiry_date, billing_address,
+                           bank_name):
+        self.cursor.execute("INSERT INTO " + self.payment_table_name + " VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                            (super().get_new_id(self.payment_table_name), account_id, card_number,
+                             security_code, card_holder_name, expiry_date, billing_address, bank_name))
+        self.connection.commit()
+
+
+class DeliveryMethodDatabase(Database):
+
+    """The init method below stores the delivery table name as an attribute, before calling the init method of the
+    superclass on the delivery table name. It then creates a new delivery table, with attributes: id, account_id,
+    address_line_1, address_line_2, address_line_3, address_city, address_country and address_postcode."""
+    def __init__(self, delivery_table_name):
+        self.delivery_table_name = delivery_table_name
+        super().__init__(delivery_table_name)
+        self.cursor.execute("CREATE TABLE IF NOT EXISTS " + self.delivery_table_name + " (id INTEGER NOT NULL \
+        PRIMARY KEY, account_id INTEGER NOT NULL, address_line_1 VARCHAR(64) NOT NULL, address_line_2 VARCHAR(64), \
+        address_line_3 VARCHAR(64), address_city VARCHAR(64) NOT NULL, address_country VARCHAR(64) NOT NULL, \
+        address_postcode CHAR(8) NOT NULL)")
+        self.connection.commit()
+
+    """The add_delivery_method method below inserts a new record into the delivery table when called."""
+    def add_delivery_method(self, account_id, address_line_1, address_line_2, address_line_3, address_city,
+                            address_country, address_postcode):
+        self.cursor.execute("INSERT INTO " + self.delivery_table_name + " VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                            (super().get_new_id(self.delivery_table_name), account_id, address_line_1,
+                             address_line_2, address_line_3, address_city, address_country, address_postcode))
+        self.connection.commit()
 
 
 
