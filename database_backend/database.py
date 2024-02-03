@@ -340,6 +340,46 @@ class DeliveryMethodDatabase(Database):
 
 
 
+class ReviewDatabase(Database):
+
+    """The init method below stores the review table as an attribute, calls the superclass init method on it, and
+    creates a table with its name with attributes: id, product_id, account_id, review_text, review_rating and
+    review_date."""
+    def __init__(self, review_table_name):
+        self.review_table_name = review_table_name
+        super().__init__(review_table_name)
+        self.cursor.execute("CREATE TABLE IF NOT EXISTS " + self.review_table_name + " (id INTEGER NOT NULL PRIMARY KEY, \
+        product_id INTEGER NOT NULL, account_id INTEGER NOT NULL, review_text CLOB, review_rating INTEGER NOT NULL, \
+        review_date DATE)")
+        self.connection.commit()
+
+    """The add_review method inserts a new record into the review_table when called."""
+    def add_review(self, product_id, account_id, review_text, review_rating, datetime):
+        self.cursor.execute("INSERT INTO " + self.review_table_name + " VALUES (?, ?, ?, ?, ?, ?)",
+                            (self.get_new_id(self.review_table_name), product_id, account_id, review_text,
+                             review_rating, datetime))
+        self.connection.commit()
+
+
+class ProductListDatabase(Database):
+
+    """The init method below stores the product list table name as an attribute, calls the superclass init method on it,
+    and creates a table containing the following attributes: id, account_id, list_type, list_name and
+    list_description."""
+    def __init__(self, product_list_table_name):
+        self.product_list_table_name = product_list_table_name
+        super().__init__(product_list_table_name)
+        self.cursor.execute("CREATE TABLE IF NOT EXISTS " + self.product_list_table_name + " (id INTEGER NOT NULL \
+        PRIMARY KEY, account_id INTEGER, list_type VARCHAR(32), list_name VARCHAR(64), list_description CLOB)")
+        self.connection.commit()
+
+    """The add_product_list method inserts a new record into the product list table when called."""
+    def add_product_list(self, account_id, list_type, list_name, list_description):
+        self.cursor.execute("INSERT INTO " + self.product_list_table_name + " VALUES(?,?,?,?,?)",
+                            (self.get_new_id(self.product_list_table_name), account_id, list_type,
+                             list_name, list_description))
+        self.connection.commit()
+
 
 
 
