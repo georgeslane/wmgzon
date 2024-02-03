@@ -68,6 +68,7 @@ class ProductDatabase(Database):
     def __init__(self, level_1_table_name):
         self.level_1_table_name = level_1_table_name
         super().__init__(level_1_table_name)
+        self.cursor.execute("SELECT load_extension('/path/to/json1/extension')")
         self.cursor.execute("CREATE TABLE IF NOT EXISTS " + self.level_1_table_name + " (id INTEGER NOT NULL \
                 PRIMARY KEY, product_name VARCHAR(64), base_price FLOAT, product_description CLOB, product_category \
                 VARCHAR(64), quantity_in_stock INTEGER, product_image_url CLOB, date_added DATETIME,\
@@ -81,7 +82,7 @@ class ProductDatabase(Database):
         self.cursor.execute("INSERT INTO " + self.level_1_table_name + " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                             (super().get_new_id(self.level_1_table_name), product_name, base_price,
                              product_description, product_category, quantity_in_stock, product_image_url, date_added,
-                             price, quantity_sold, product_discount))
+                             price, quantity_sold, product_discount,))
         self.connection.commit()
 
 
@@ -338,8 +339,6 @@ class DeliveryMethodDatabase(Database):
         self.connection.commit()
 
 
-
-
 class ReviewDatabase(Database):
 
     """The init method below stores the review table as an attribute, calls the superclass init method on it, and
@@ -348,9 +347,9 @@ class ReviewDatabase(Database):
     def __init__(self, review_table_name):
         self.review_table_name = review_table_name
         super().__init__(review_table_name)
-        self.cursor.execute("CREATE TABLE IF NOT EXISTS " + self.review_table_name + " (id INTEGER NOT NULL PRIMARY KEY, \
-        product_id INTEGER NOT NULL, account_id INTEGER NOT NULL, review_text CLOB, review_rating INTEGER NOT NULL, \
-        review_date DATE)")
+        self.cursor.execute("CREATE TABLE IF NOT EXISTS " + self.review_table_name + " (id INTEGER NOT NULL \
+        PRIMARY KEY, product_id INTEGER NOT NULL, account_id INTEGER NOT NULL, review_text CLOB, review_rating INTEGER \
+        NOT NULL, review_date DATE)")
         self.connection.commit()
 
     """The add_review method inserts a new record into the review_table when called."""
@@ -379,6 +378,31 @@ class ProductListDatabase(Database):
                             (self.get_new_id(self.product_list_table_name), account_id, list_type,
                              list_name, list_description))
         self.connection.commit()
+
+
+class ProductListItemsDatabase(Database):
+
+    """The init method below creates a table containing the following attributes: id, product_list_id and product_id.
+    Every record is a unique combination of product_id and product_list_id."""
+    def __init__(self, product_list_items_table_name):
+        self.product_list_items_table_name = product_list_items_table_name
+        super().__init__(product_list_items_table_name)
+        self.cursor.execute("CREATE TABLE IF NOT EXISTS " + self.product_list_items_table_name + " (id INTEGER \
+        NOT NULL PRIMARY KEY, product_list_id INTEGER NOT NULL, product_id INTEGER NOT NULL)")
+        self.connection.commit()
+
+    def add_product_to_list(self, product_list_id, product_id):
+        self.cursor.execute("INSERT INTO " + self.product_list_items_table_name + " VALUES(?,?,?)",
+                            (self.get_new_id(self.product_list_items_table_name), product_list_id,
+                             product_id))
+        self.connection.commit()
+
+
+
+
+
+
+
 
 
 
