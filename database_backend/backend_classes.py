@@ -1,47 +1,42 @@
 import datetime
-import database
+import database_table_names as db_tables
 class Product:
-    """Contains attributes: product_id, product_name, product_base_price, product_description, product_category,
-    product_quantity_in_stock, product_image_url,product_date_added, product_price.
-    And methods: purchase_increment_stock, calculate_discounted_price, apply_discount, add_tags,get_similar_products,
-    get_reviews, add_product_to_list, change_product_info."""
 
-    def __init__(self, name, base_price, description, category, quantity_in_stock, image_url):
-        self.product_id = database.ProductTable.get_new_id()
-        self.product_name = name
-        self.product_base_price = base_price
-        self.product_description = description
-        self.product_category = category
-        self.product_quantity_in_stock = quantity_in_stock
-        self.product_image_url = image_url
-        self.product_date_added = datetime.datetime.now()
-        self.product_price = self.product_base_price * (1 - self.product_discount)
-        database.ProductTable.add_product(self.product_name, self.product_base_price, self.product_description, \
-                                          self.product_category, self.product_quantity_in_stock, \
-                                          self.product_image_url, self.product_date_added, self.product_price, self.product_quantity_sold, \
-                                          self.product_discount)
+    def __init__(self, id):
+        self.id = id
 
-    product_quantity_sold = 0
-    product_discount = 0
-    product_tags = []
+    def add_new_product(self, product_name, base_price, product_description, product_category,
+                    quantity_in_stock, product_image_url, date_added, price, quantity_sold, product_discount):
+        db_tables.Product.add_product(product_name, base_price, product_description, product_category,
+                    quantity_in_stock, product_image_url, date_added, price, quantity_sold, product_discount)
 
     def purchase_increment_stock(self):
-        self.product_quantity_sold += 1
-        self.product_quantity_in_stock -= 1
-    def calculate_discounted_price(self):
-        self.product_price = self.product_base_price * (1 - self.product_discount)
-    def apply_discount(self, discount):
-        self.product_discount = discount
-    def add_tags(self, tag):
-        self.product_tags.append(tag)
-    # def get_similar_products(self):
-    #     #Add a method to the Product class that returns a list of similar products.
-    # def get_reviews(self):
-    #     #Add a method to the Product class that returns a list of reviews.
-    # def add_product_to_list(self):
-    #     #Add a method to the Product class that adds a product to the list of products.
-    # def change_product_info(self, new_input):
-    #     #Add a method to the Product class that changes the information of a product.
+        quantity_in_stock = db_tables.Product.get_record_value(db_tables.Product.level_1_table_name, self.id, 'quantity_in_stock')
+        db_tables.Product.update_record(db_tables.Product.level_1_table_name, self.id, quantity_in_stock)
+        quantity_sold = db_tables.Product.get_record_value(db_tables.Product.level_1_table_name, self.id, 'quantity_sold')
+        db_tables.Product.update_record(db_tables.Product.level_1_table_name, self.id, quantity_sold)
+    def discount_price(self, discount):
+        base_price = db_tables.Product.get_record_value(db_tables.Product.level_1_table_name, self.id, 'base_price')
+        price = base_price * (1 - discount)
+        db_tables.Product.update_record(db_tables.Product.level_1_table_name, self.id, 'price', price)
+        db_tables.Product.update_record(db_tables.Product.level_1_table_name, self.id, 'product_discount', discount)
+
+    def get_reviews(self):
+        product_ids = db_tables.Review.get_id_from_any_column('product_id', self.id)
+        for id in product_ids:
+            db_tables.Review.get_record(id)
+
+    def
+
+
+
+
+    def get_similar_products(self):
+
+    def add_product_to_list(self):
+
+    def change_product_info(self, new_input):
+
 
 class ProductBook(Product):
     """Inherits from Product. Contains attributes: media_type, author, synopsis, genre, language, publisher, edition,

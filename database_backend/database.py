@@ -20,8 +20,19 @@ class Database:
     """The get_record method below takes an id (unique primary key) as an argument and returns the associated record 
     from the table denoted by 'self.table_name'."""
     def get_record(self, id):
-        self.cursor.execute("SELECT * FROM " + self.table_name + " WHERE id = ?", (self.SqlReader.convert_to_tuple(id)))
-        return self.cursor.fetchall()
+        try:
+            self.cursor.execute("SELECT * FROM " + self.table_name + " WHERE id = ?", (self.SqlReader.convert_to_tuple(id)))
+            result = self.cursor.fetchall()
+            return self.SqlReader.convert_from_tuple(result)
+        except IndexError:
+            'The inputted ID does not exist in the table'
+
+    """The method below gets all ids from a table, where a particular column matches a particular value. """
+    def get_id_from_any_column(self, column_name, value):
+        self.cursor.execute("SELECT id FROM " + self.table_name + " WHERE " + column_name + " = ?", (self.SqlReader.convert_to_tuple(value)))
+        results = self.cursor.fetchall()
+        results = self.SqlReader.convert_from_plural_tuples(results)
+        return results
 
     """The delete_record method below takes a unique id as an argument and 
     deletes the record with that id from 'self.table_name'."""
@@ -35,9 +46,16 @@ class Database:
         if column_name == 'id':
             raise Exception('Cannot change the id of a record')
         else:
-            self.cursor.execute("UPDATE " + table_name + " SET ? = ? WHERE id = ?",
-                                (column_name, new_value, self.SqlReader.convert_to_tuple(id)))
+            self.cursor.execute("UPDATE " + table_name + " SET " + column_name + " = ? WHERE id = ?",
+                                (new_value, id))
             self.connection.commit()
+
+    """The method below gets a specific value from a record in a table."""
+    def get_record_value(self, table_name, id, column_name):
+        self.cursor.execute("SELECT " + column_name + " FROM " + table_name + " WHERE id = ?", (self.SqlReader.convert_to_tuple(id)))
+        result = self.cursor.fetchall()
+        return self.SqlReader.convert_from_tuple(result)
+
 
     """The get_new_id function below is called when creating a new record in a table. It first checks how many records 
     are in that table. If there are 0 records, the new record is assigned an id of 1. If there are already records in
@@ -68,7 +86,6 @@ class ProductDatabase(Database):
     def __init__(self, level_1_table_name):
         self.level_1_table_name = level_1_table_name
         super().__init__(level_1_table_name)
-        self.cursor.execute("SELECT load_extension('/path/to/json1/extension')")
         self.cursor.execute("CREATE TABLE IF NOT EXISTS " + self.level_1_table_name + " (id INTEGER NOT NULL \
                 PRIMARY KEY, product_name VARCHAR(64), base_price FLOAT, product_description CLOB, product_category \
                 VARCHAR(64), quantity_in_stock INTEGER, product_image_url CLOB, date_added DATETIME,\
