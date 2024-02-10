@@ -40,6 +40,18 @@ class TestProductDatabase:
     def test_get_record_value(self):
         assert db_tables.Product.get_record_value('TEST_PRODUCT', 1, 'product_category') == ['Fiction']
 
+class TestProductBookDatabase:
+
+    def add_book(self):
+        db_tables.ProductBook.add_book('The BFG', 12, 'The big friendly giant', 'Book', 23, 'dfhagfdgsjfgdjsfg', '2024-01-01', 5, 67, 0.1, 'electronic', 'A story about a giant who turns good', 'Fantasy', 'English', 'Random house', '1st', 1232343454567, False, 34, 5)
+
+    def test_get_record(self):
+        self.add_book()
+        assert db_tables.ProductBook.get_record(3) == [3, 'The BFG', 12.0, 'The big friendly giant', 'Book', 23, 'dfhagfdgsjfgdjsfg', '2024-01-01', 5.0, 67, 0.1, 3, 'electronic', 'A story about a giant who turns good', 'Fantasy', 'English', 'Random house', '1st', '1232343454567', 0, 34, 5]
+
+    def test_delete_record(self):
+        db_tables.ProductBook.delete_record(3)
+        assert db_tables.Product.get_record(3) == None and db_tables.ProductBook.get_record(3) == None
 
 
 

@@ -134,11 +134,16 @@ class ProductBookDatabase(ProductDatabase):
     """The get_record method below overwrites the get_record method from the Database class. 
     It returns the joined record from the Product and ProductBook tables."""
     def get_record(self, id):
-        self.cursor.execute("SELECT * FROM " + self.level_1_table_name + " INNER JOIN\
-         " + self.level_2_table_name + " ON " + self.level_1_table_name + ".id=\
-         " + self.level_2_table_name + ".id  WHERE " + self.level_1_table_name + ".id = ?",
+        try:
+            self.cursor.execute("SELECT * FROM " + self.level_1_table_name + " INNER JOIN\
+             " + self.level_2_table_name + " ON " + self.level_1_table_name + ".id=\
+             " + self.level_2_table_name + ".id  WHERE " + self.level_1_table_name + ".id = ?",
                             (self.SqlReader.convert_to_tuple(id)))
-        return self.cursor.fetchall()
+            result = self.cursor.fetchall()
+            return self.SqlReader.convert_from_tuple(result)
+
+        except IndexError:
+            'The inputted ID does not exist in the table'
 
     """The delete_record method below overwrites the delete_record method from the Database class. 
     It deletes records of the same id from both the Product and ProductBook tables."""
