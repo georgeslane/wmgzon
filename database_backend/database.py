@@ -284,7 +284,7 @@ class AccountDatabase(Database):
         self.cursor.execute("INSERT INTO " + self.password_table_name + " VALUES (?, ?)",
                             (super().get_new_id(self.account_table_name) - 1,
                              self.AccountSecurity.hash_password(password,
-                                                                str(super().get_new_id(self.account_table_name) - 1))))
+                                                                super().get_new_id(self.account_table_name) - 1)))
         self.connection.commit()
 
     """The get_id_from_username method below takes a username as argument and returns the database id associated 
@@ -292,7 +292,8 @@ class AccountDatabase(Database):
     def get_id_from_username(self, username):
         self.cursor.execute("SELECT id FROM " + self.account_table_name + " WHERE username = ?",
                             (self.SqlReader.convert_to_tuple(username)))
-        return self.cursor.fetchall()
+        result = self.cursor.fetchall()
+        return self.SqlReader.convert_from_tuple(result)
 
     """The delete_record method below overwrites the delete_record method from the Database class, altering it to 
     delete the record from both the account and password tables."""

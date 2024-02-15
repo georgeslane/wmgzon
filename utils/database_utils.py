@@ -1,5 +1,6 @@
 import bcrypt
-
+import random
+import string
 class SqliteReader():
 
     """The method below converts any single value input into a tuple of size 1"""
@@ -28,5 +29,19 @@ class AccountSecurity():
     """The following method takes a password input and a salt input, combines inputs and hashes the combined string
     using the bcrypt.hashpw function."""
     def hash_password(self, password, salt):
+        password = password.encode('utf-8')
+        salt = salt.encode('utf-8')
         return bcrypt.hashpw(password, salt)
+
+    def generate_salt(self):
+        char_list = string.ascii_lowercase
+        salt = ''
+        while len(salt) < 8:
+            for char in char_list:
+                if random.randint(0, 100) == 0:
+                    salt = salt + char
+                    continue
+                else:
+                    pass
+
 

@@ -1,37 +1,27 @@
 import datetime
 import database_table_names as db_tables
-class Product:
 
-    def __init__(self, id):
-        self.id = id
+
+class Product:
 
     def add_new_product(self, product_name, base_price, product_description, product_category,
                     quantity_in_stock, product_image_url, date_added, price, quantity_sold, product_discount):
         db_tables.Product.add_product(product_name, base_price, product_description, product_category,
                     quantity_in_stock, product_image_url, date_added, price, quantity_sold, product_discount)
 
-    def purchase_increment_stock(self):
-        quantity_in_stock = db_tables.Product.get_record_value(db_tables.Product.level_1_table_name, self.id, 'quantity_in_stock')
-        db_tables.Product.update_record(db_tables.Product.level_1_table_name, self.id, quantity_in_stock)
-        quantity_sold = db_tables.Product.get_record_value(db_tables.Product.level_1_table_name, self.id, 'quantity_sold')
-        db_tables.Product.update_record(db_tables.Product.level_1_table_name, self.id, quantity_sold)
-    def discount_price(self, discount):
-        base_price = db_tables.Product.get_record_value(db_tables.Product.level_1_table_name, self.id, 'base_price')
+    def purchase_increment_stock(self, id):
+        quantity_in_stock = db_tables.Product.get_record_value(db_tables.Product.level_1_table_name, id, 'quantity_in_stock')
+        db_tables.Product.update_record(db_tables.Product.level_1_table_name, id, quantity_in_stock)
+        quantity_sold = db_tables.Product.get_record_value(db_tables.Product.level_1_table_name, id, 'quantity_sold')
+        db_tables.Product.update_record(db_tables.Product.level_1_table_name, id, quantity_sold)
+
+    def discount_price(self, id, discount):
+        base_price = db_tables.Product.get_record_value(db_tables.Product.level_1_table_name, id, 'base_price')
         price = base_price * (1 - discount)
-        db_tables.Product.update_record(db_tables.Product.level_1_table_name, self.id, 'price', price)
-        db_tables.Product.update_record(db_tables.Product.level_1_table_name, self.id, 'product_discount', discount)
+        db_tables.Product.update_record(db_tables.Product.level_1_table_name, id, 'price', price)
+        db_tables.Product.update_record(db_tables.Product.level_1_table_name, id, 'product_discount', discount)
 
-    def get_reviews(self):
-        product_ids = db_tables.Review.get_id_from_any_column('product_id', self.id)
-        for id in product_ids:
-            db_tables.Review.get_record(id)
-
-    def
-
-
-
-
-    def get_similar_products(self):
+    # def get_similar_products(self):
 
     def add_product_to_list(self):
 
@@ -58,13 +48,30 @@ class Review:
     """Contains attributes: review_id, account_id, product_id, review_text, review_rating, review_date.
     And methods: edit_review, delete_review, report_review"""
 
-    def __init__(self, account_id, product_id, review_text, review_rating):
-        self.account_id = account_id
-        self.product_id = product_id
-        self.review_text = review_text
-        self.review_rating = review_rating
-        self.review_date = datetime.datetime.now()
-        self.review_id = self.account_id + self.product_id
+
+    def add_review(self, product_id, account_id, review_text, review_rating):
+        review_date = datetime.datetime.now()
+        db_tables.Review.add_review(product_id, account_id, review_text, review_rating, review_date)
+
+    def edit_review_rating(self, id, new_rating):
+        db_tables.Review.update_record(db_tables.Review.review_table_name, id, 'review_rating', new_rating)
+
+    def edit_review_text(self, id, new_text):
+        db_tables.Review.update_record(db_tables.Review.review_table_name, id, 'review_text', new_text)
+
+    def delete_review(self, id):
+        db_tables.Review.delete_record(id)
+
+    def get_reviews_for_product(self, product_id):
+        review_ids = db_tables.Review.get_id_from_any_column('product_id', product_id)
+        for id in review_ids:
+            db_tables.Review.get_record(id)
+
+    def get_reviews_for_account(self, account_id):
+        review_ids = db_tables.Review.get_id_from_any_column('account_id', account_id)
+        for id in review_ids:
+            db_tables.Review.get_record(id)
+
 class ProductList:
     """Contains attributes: product_list_id, product_list_type, product_list_name, product_list_description,
     product_ids, account_id.

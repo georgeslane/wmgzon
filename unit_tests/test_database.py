@@ -54,5 +54,12 @@ class TestProductBookDatabase:
         assert db_tables.Product.get_record(3) == None and db_tables.ProductBook.get_record(3) == None
 
 
+class TestAccountDatabase:
 
+    def add_account(self):
+        db_tables.Account.add_account('donald_duck', 'duckling4ever@gmail.com', 'CUST', 'qwerty')
+
+    def test_get_id_from_username(self):
+        self.add_account()
+        assert db_tables.Account.get_id_from_username(1) == 'donald_duck'
 
