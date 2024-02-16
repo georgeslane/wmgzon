@@ -2,7 +2,8 @@
 
 # Dependancies:
 - Python
-- Flask
+- flask
+- flask-login
 - SQLite3
 - Pytest
 - bcrypt
