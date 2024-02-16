@@ -28,8 +28,8 @@ class Database:
             'The inputted ID does not exist in the table'
 
     """The method below gets all ids from a table, where a particular column matches a particular value. """
-    def get_id_from_any_column(self, column_name, value):
-        self.cursor.execute("SELECT id FROM " + self.table_name + " WHERE " + column_name + " = ?", (self.SqlReader.convert_to_tuple(value)))
+    def get_id_from_any_column(self, table_name, column_name, value):
+        self.cursor.execute("SELECT id FROM " + table_name + " WHERE " + column_name + " = ?", (self.SqlReader.convert_to_tuple(value)))
         results = self.cursor.fetchall()
         results = self.SqlReader.convert_from_plural_tuples(results)
         return results
@@ -55,7 +55,6 @@ class Database:
         self.cursor.execute("SELECT " + column_name + " FROM " + table_name + " WHERE id = ?", (self.SqlReader.convert_to_tuple(id)))
         result = self.cursor.fetchall()
         return self.SqlReader.convert_from_tuple(result)
-
 
     """The get_new_id function below is called when creating a new record in a table. It first checks how many records 
     are in that table. If there are 0 records, the new record is assigned an id of 1. If there are already records in
@@ -102,19 +101,28 @@ class ProductDatabase(Database):
                              price, quantity_sold, product_discount,))
         self.connection.commit()
 
+    """The search_products method below takes a search term as an argument and returns records that have a matching 
+    name or category from the product table."""
+    def search_products(self, search_term):
+        self.cursor.execute("SELECT id FROM " + self.level_1_table_name + " WHERE product_name LIKE '%" + search_term
+                            + "%' OR product_category LIKE '%" + search_term + "%'")
+        results = self.cursor.fetchall()
+        results = self.SqlReader.convert_from_plural_tuples(results)
+        return results
+
 
 class ProductBookDatabase(ProductDatabase):
 
     """The init method below calls the ProductDatabase class initialisation method for the product table, before
     storing the Product and ProductBook table names as 'level_1_table_name' and 'level_2_table_name' respectively.
-    It then creates a new ProductBook table, with attributes: id, media_type, synopsis, genre, language, publisher,
-    edition, isbn, illustrations, series_id and position_in_series."""
+    It then creates a new ProductBook table, with attributes: id, author, media_type, synopsis, genre, language,
+    publisher, edition, isbn, illustrations, series_id and position_in_series."""
     def __init__(self, level_1_table_name, level_2_table_name):
         super().__init__(level_1_table_name)
         self.level_1_table_name = level_1_table_name
         self.level_2_table_name = level_2_table_name
         self.cursor.execute("CREATE TABLE IF NOT EXISTS " + self.level_2_table_name + " (id INTEGER NOT NULL \
-                            PRIMARY KEY, media_type VARCHAR(64), synopsis CLOB, genre VARCHAR(64), language \
+                            PRIMARY KEY, author VARCHAR(64), media_type VARCHAR(64), synopsis CLOB, genre VARCHAR(64), language \
                             VARCHAR(64), publisher VARCHAR(64), edition VARCHAR(64), isbn CHAR(13), illustrations \
                             BOOLEAN, series_id INTEGER, position_in_series INTEGER)")
         self.connection.commit()
@@ -122,13 +130,14 @@ class ProductBookDatabase(ProductDatabase):
     """The add_book method below calls the add_product method from the ProductDatabase class to add a new record to the 
     product table, before also adding a new record to the book table with the same id."""
     def add_book(self, product_name, base_price, product_description, product_category, quantity_in_stock,
-                 product_image_url, date_added, price, quantity_sold, product_discount, media_type, synopsis, genre,
+                 product_image_url, date_added, price, quantity_sold, product_discount, author, media_type, synopsis, genre,
                  language, publisher, edition, isbn, illustrations, series_id, position_in_series):
         super().add_product(product_name, base_price, product_description, product_category,
                             quantity_in_stock, product_image_url, date_added, price, quantity_sold, product_discount)
-        self.cursor.execute("INSERT INTO " + self.level_2_table_name + " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                            ((super().get_new_id(self.level_1_table_name) - 1), media_type, synopsis, genre,
-                             language, publisher, edition, isbn, illustrations, series_id, position_in_series))
+        self.cursor.execute("INSERT INTO " + self.level_2_table_name + " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                            ((super().get_new_id(self.level_1_table_name) - 1), author, media_type,
+                             synopsis, genre, language, publisher, edition, isbn, illustrations, series_id,
+                             position_in_series))
         self.connection.commit()
 
     """The get_record method below overwrites the get_record method from the Database class. 
@@ -175,12 +184,13 @@ class ProductDigitalBookDatabase(ProductBookDatabase):
     record to the Product and ProductBook tables, before also adding a new record to the ProductDigitalBook table with 
     the same id."""
     def add_digital_book(self, product_name, base_price, product_description, product_category, quantity_in_stock,
-                         product_image_url, date_added, price, quantity_sold, product_discount, media_type, synopsis,
-                         genre, language, publisher, edition, isbn, illustrations, series_id, position_in_series,
-                         length, narrator, dramatised, file_format, storage_size):
+                         product_image_url, date_added, price, quantity_sold, product_discount, author, media_type,
+                         synopsis, genre, language, publisher, edition, isbn, illustrations, series_id,
+                         position_in_series, length, narrator, dramatised, file_format, storage_size):
         super().add_book(product_name, base_price, product_description, product_category, quantity_in_stock,
-                         product_image_url, date_added, price, quantity_sold, product_discount, media_type, synopsis,
-                         genre, language, publisher, edition, isbn, illustrations, series_id, position_in_series)
+                         product_image_url, date_added, price, quantity_sold, product_discount, author, media_type,
+                         synopsis, genre, language, publisher, edition, isbn, illustrations, series_id,
+                         position_in_series)
         self.cursor.execute("INSERT INTO " + self.level_3_table_name + " VALUES (?, ?, ?, ?, ?, ?)",
                             ((super().get_new_id(self.level_1_table_name) - 1), length, narrator,
                              dramatised, file_format, storage_size))
@@ -227,12 +237,13 @@ class ProductPhysicalBookDatabase(ProductBookDatabase):
     record to the Product and ProductBook tables, before also adding a new record to the ProductPhysicalBook table with 
     the same id."""
     def add_physical_book(self, product_name, base_price, product_description, product_category, quantity_in_stock,
-                          product_image_url, date_added, price, quantity_sold, product_discount, media_type, synopsis,
-                          genre, language, publisher, edition, isbn, illustrations, series_id, position_in_series,
-                          product_condition, product_format, shipping_time):
+                          product_image_url, date_added, price, quantity_sold, product_discount, author, media_type,
+                          synopsis, genre, language, publisher, edition, isbn, illustrations, series_id,
+                          position_in_series, product_condition, product_format, shipping_time):
         super().add_book(product_name, base_price, product_description, product_category, quantity_in_stock,
-                         product_image_url, date_added, price, quantity_sold, product_discount, media_type, synopsis,
-                         genre, language, publisher, edition, isbn, illustrations, series_id, position_in_series)
+                         product_image_url, date_added, price, quantity_sold, product_discount, author, media_type,
+                         synopsis, genre, language, publisher, edition, isbn, illustrations, series_id,
+                         position_in_series)
         self.cursor.execute("INSERT INTO " + self.level_3_table_name + " VALUES (?, ?, ?, ?)",
                             ((super().get_new_id(self.level_1_table_name) - 1), product_condition,
                              product_format, shipping_time))
