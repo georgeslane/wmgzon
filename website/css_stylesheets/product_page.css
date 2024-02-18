@@ -32,10 +32,36 @@
 }
 
 #product_page {
+    background: #ffffff;
     height: auto;
-    margin: 2%;
+    margin:0;
     display: flex;
     align-items: flex-start;
+}
+
+.product_options{
+    background: #949494;
+    height: 40px;
+    width:100px;
+    opacity: 90%
+}
+
+#add_to_basket{
+    height: 40px;
+    width: 200px;
+    opacity: 90%;
+    background: #30799B;
+}
+
+#product_specifications{
+    display: block;
+    align-content: space-evenly;
+}
+
+.product_attribute_icons{
+    height: 50px;
+    width: 50px;
+    margin-right: 10%
 }
 
 

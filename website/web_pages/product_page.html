@@ -11,8 +11,8 @@
 <div class ='header_bar'>
     <img class="header_bar_elements" style="object-fit:contain; object-position: left" src="../../website/images/wmgzon_logo.png" alt="WMGzon logo"/>
     <input class="header_bar_elements" style="border-radius: 6px; border: 2px" type="text" placeholder="Search products"/>
-    <a class = "header_bar_elements" style="margin-left: 20%; width: 16.66%; font-size: large" href="../../website/web_pages/account_page.html">Account</a>
-    <a class = "header_bar_elements" style="margin-left: 2%; width: 16.66%; font-size: large" href="../../website/web_pages/basket_page.html">Basket</a>
+    <a href="../../website/web_pages/account_page"><img class ="header_bar_elements", src="../../website/images/account.png", alt="Account", style="width: 40px; height: 40px; margin-left: 23%", href="../../website/web_pages/account_page.html"/> </a>
+    <a href="../../website/web_pages/basket"><img class ="header_bar_elements", src="../../website/images/basket.png", alt="Basket", style="width: 40px; height: 40px; margin-left: 2%; opacity: 70%", href="../../website/web_pages/basket_page.html"/> </a>
 </div>
 
 <div class="category_bar">
@@ -25,33 +25,51 @@
 </div>
 
 <div id="product_page">
-    <img src="../../website/images/the_agile_samuari.png" alt="The agile samurai"/>
-    <span style="padding-left:10%">
-        <h3>Title: Description</h3>
+    <img src="../../website/images/the_agile_samuari.png" alt="The agile samurai" style="margin:3%"/>
+    <span style="margin-left:3%; margin-top: 2.5%">
+        <h3>Title: Descriptionhjsdgfjhs dgjfhgsdjhfgs djhgfhsdj gfjhsgdhjfgsdhjfgs djhfgjhdsgf jhsdgfhjdsgf</h3>
         <div>
             <img src="../../website/images/yellow_star.png" alt="Rating" style="width: 25px; height:25px"/>
             <img src="../../website/images/yellow_star.png" alt="Rating" style="width: 25px; height:25px"/>
             <img src="../../website/images/yellow_star.png" alt="Rating" style="width: 25px; height:25px"/>
             <img src="../../website/images/yellow_star.png" alt="Rating" style="width: 25px; height:25px"/>
             <img src="../../website/images/grey_star.png" alt="Rating" style="width: 25px; height:25px"/>
-            <a href="../../website/web_pages_leave_review.html" >Leave a review</a>
+            <a href="../../website/web_pages_leave_review.html" style="margin-left: 3%">Leave a review</a>
         </div>
         <br>
-        <p>Author: Jonathan Rasmusson</p>
-        <p>Price: £20.00</p>
-        <p>Category: Books</p>
-        <p>ISBN: 978-1934356586</p>
-        <p>Pages: 376</p>
-        <p>Language: English</p>
-        <p>Dimensions: 18.8 x 2.1 x 23.5 cm</p>
-        <p>Weight: 1.1 kg</p>
-        <p>Rating: 4.5/5</p>
-        <p>Quantity: <input type="number" value="1" min="1" max="10"></p>
-        <button>Add to basket</button>
+        <p style="font-size: large">Price: £20.00</p>
+        <div>
+            <button class ="product_options">Paperback</button>
+            <button class ="product_options">Hardcover</button>
+            <button class ="product_options">e-book</button>
+            <button class ="product_options">Audiobook</button>
+        </div>
+        <br>
+        <button id ="add_to_basket">Add to basket</button>
+        <hr style="margin-right:5%">
+        <p style="margin-right:5%">This XMLHttpRequest is an object that can be used to exchange data with a web server behind the scenes. It is supported by all browsers. Because it works behind the scenes we can update our page with incoming data without having to reload the page.</p>
+        <div id="product_specifications">
+            <hr style="margin-right: 5%">
+            <span style="margin-left:0.75%; margin-right:8%">ISBN</span>
+            <span style="margin-right:5.25%">Date published</span>
+            <span style="margin-right:8.5%">Language</span>
+            <span style="margin-right:8%">Author</span>
+            <span style="margin-right:10%">Page count</span>
+            <br>
+            <img src="../../website/images/isbn.png", alt="ISBN", class="product_attribute_icons"/>
+            <img src="../../website/images/calendar.png", alt="Date published", class="product_attribute_icons"/>
+            <img src="../../website/images/globe.png", alt="Language", class="product_attribute_icons", style="height:40px; width:40px; margin-right: calc(10px + 10%)"/>
+            <img src="../../website/images/author.png", alt="Author", class="product_attribute_icons", style="height:40px; width:40px; opacity: 75%"/>
+            <img src="../../website/images/page_count.png", alt="Page count", class="product_attribute_icons"/>
+            <p>976-543-556</p>
+
+        </div>
     </span>
 
 
+
 </div>
+<hr style="margin: 2.5%">
 
 
 
