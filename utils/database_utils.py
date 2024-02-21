@@ -10,8 +10,11 @@ class SqliteReader():
     """The method below converts any tuple of size n stored inside a list of size 1 into a list of size n, with each 
     element of the list coresponding to an element of the tuple."""
     def convert_from_tuple(self, input):
-        input = list(input[0])
-        return input
+        try:
+            input = list(input[0])
+            return input
+        except IndexError:
+            return 0
 
     """The following method takes a list of size n, containing tuples, each of size 1, and returns a list of size n, 
     containing non tuple elements."""

@@ -36,7 +36,7 @@ class Product:
     """The get_reviews_for_product method returns all reviews for a given product in the form of a for loop that 
     returns each review as a list."""
     def get_reviews_for_product(self, product_id):
-        review_ids = db_tables.Review.get_id_from_any_column(db_tables.Review.table_name, 'product_id', product_id)
+        review_ids = db_tables.Review.get_id_from_any_column(db_tables.Review.table_name, 'product_id', (product_id,))
         reviews = []
         for review_id in review_ids:
             reviews.append(db_tables.Review.get_record(review_id))
@@ -79,17 +79,30 @@ class ProductBook(Product):
 
     def view_similar_genre(self, id):
         genre = db_tables.ProductBook.get_record_value(db_tables.ProductBook.level_2_table_name, id, 'genre')
-        product_ids = db_tables.ProductBook.get_id_from_any_column(db_tables.ProductBook.level_2_table_name, 'genre',
+        if genre != 0:
+            product_ids = db_tables.ProductBook.get_id_from_any_column(db_tables.ProductBook.level_2_table_name, 'genre',
                                                                    genre)
-        for product_id in product_ids:
-            db_tables.ProductBook.get_record(product_id)
+            products = []
+            for product_id in product_ids:
+                product = db_tables.ProductBook.get_record(product_id)
+                products.append(product)
+            return products
+        else:
+            return ['null']
+
 
     def view_similar_author(self, id):
         author = db_tables.ProductBook.get_record_value(db_tables.ProductBook.level_2_table_name, id, 'author')
-        product_ids = db_tables.ProductBook.get_id_from_any_column(db_tables.ProductBook.level_2_table_name, 'author',
+        if author != 0:
+            product_ids = db_tables.ProductBook.get_id_from_any_column(db_tables.ProductBook.level_2_table_name, 'author',
                                                                    author)
-        for product_id in product_ids:
-            db_tables.ProductBook.get_record(product_id)
+            products = []
+            for product_id in product_ids:
+                product = db_tables.ProductBook.get_record(product_id)
+                products.append(product)
+            return products
+        else:
+            return ['null']
 
     def view_others_in_series(self, id):
         list_of_products = []

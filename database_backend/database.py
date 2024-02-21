@@ -29,7 +29,7 @@ class Database:
 
     """The method below gets all ids from a table, where a particular column matches a particular value. """
     def get_id_from_any_column(self, table_name, column_name, value):
-        self.cursor.execute("SELECT id FROM " + table_name + " WHERE " + column_name + " = ?", (self.SqlReader.convert_to_tuple(value)))
+        self.cursor.execute("SELECT id FROM " + table_name + " WHERE " + column_name + " = ?", value)
         results = self.cursor.fetchall()
         results = self.SqlReader.convert_from_plural_tuples(results)
         return results

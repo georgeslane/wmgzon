@@ -91,76 +91,17 @@
 <hr style="margin: 3%">
 <h4 style="margin:3%">Product reviews</h4>
 <div id="review_divide">
-    <div class="review_pair">
-        <div class="review_sub_divide">
-            <span>
-                <h5>Review description</h5>
-                <img src="../static/yellow_star.png" alt="Rating" class="rating_stars"/>
-                <img src="../static/yellow_star.png" alt="Rating" class="rating_stars"/>
-                <img src="../static/yellow_star.png" alt="Rating" class="rating_stars"/>
-                <img src="../static/yellow_star.png" alt="Rating" class="rating_stars"/>
-                <img src="../static/grey_star.png" alt="Rating" class="rating_stars"/>
-            </span>
-            <br>
-            <br>
-            <p>Review text- this is the meat of the review- did the customer like it?</p>
-        </div>
-        <div class="review_sub_divide">
-            <span>
-                <h5>Review description</h5>
-                <img src="../static/yellow_star.png" alt="Rating" class="rating_stars"/>
-                <img src="../static/yellow_star.png" alt="Rating" class="rating_stars"/>
-                <img src="../static/yellow_star.png" alt="Rating" class="rating_stars"/>
-                <img src="../static/yellow_star.png" alt="Rating" class="rating_stars"/>
-                <img src="../static/grey_star.png" alt="Rating" class="rating_stars"/>
-            </span>
-            <br>
-            <br>
-            <p>Review text- this is the meat of the review- did the customer like it?</p>
-        </div>
-    </div>
-    <div class="review_sub_divide">
-        <h5>Review description</h5>
-        <p>Review text- this is the meat of the review- did the customer like it?</p>
-    </div>
-    <div class="review_sub_divide">
-        <h5>Review description</h5>
-        <p>Review text- this is the meat of the review- did the customer like it?</p>
-    </div>
-    <div class="review_sub_divide">
-        <h5>Review description</h5>
-        <p>Review text- this is the meat of the review- did the customer like it?</p>
-    </div>
-    <div class="review_sub_divide">
-        <h5>Review description</h5>
-        <p>Review text- this is the meat of the review- did the customer like it?</p>
-    </div>
-    <div class="review_sub_divide">
-        <h5>Review description</h5>
-        <p>Review text- this is the meat of the review- did the customer like it?</p>
-    </div>
+
 </div>
 
 <hr style="margin: 3%">
-<h4 style="margin-left:3%">Books by the same author:</h4>
-<div class="similar_products">
-    <div class="similar_products_sub_div">
-        <img src="../static/the_agile_samuari.png" alt="The agile samurai" class="similar_products_image"/>
-        <a href="/product_page.html">The agile samurai</a>
-    </div>
-    <div class="similar_products_sub_div">
-        <img src="../static/the_agile_samuari.png" alt="The agile samurai" class="similar_products_image"/>
-        <a href="/product_page.html">The agile samurai</a>
-    </div>
+<h4 style="margin-left:3%">Other books by {{product[12]}}:</h4>
+<div class="similar_products"  id ="same_author_div">
 </div>
 
 <hr style="margin: 3%">
-<h4 style="margin-left:3%">Books in the same genre:</h4>
-<div class="similar_products">
-    <div class="similar_products_sub_div">
-        <img src="../static/the_agile_samuari.png" alt="The agile samurai" class="similar_products_image"/>
-        <a href="/product_page.html">The agile samurai</a>
-    </div>
+<h4 style="margin-left:3%">Other books in {{product[15]}}:</h4>
+<div class="similar_products" id="same_genre_div">
 </div>
 
 <hr style="margin: 3%">
@@ -174,21 +115,21 @@
     </tr>
     <tr>
         <td class="product_specifications_cells">Genre</td>
-        <td class="product_specifications_cells"></td>
-        <td class="product_specifications_cells">Dimensions</td>
-        <td class="product_specifications_cells"></td>
+        <td class="product_specifications_cells">{{product[15]}}</td>
+        <td class="product_specifications_cells">Publisher</td>
+        <td class="product_specifications_cells">{{product[17]}}</td>
     </tr>
         <tr>
         <td class="product_specifications_cells">Media type</td>
-        <td class="product_specifications_cells"></td>
-        <td class="product_specifications_cells">Publisher</td>
-        <td class="product_specifications_cells"></td>
+        <td class="product_specifications_cells">{{product[13]}}</td>
+        <td class="product_specifications_cells">Edition</td>
+        <td class="product_specifications_cells">{{product[18]}}</td>
     </tr>
         <tr>
-        <td class="product_specifications_cells">Edition</td>
-        <td class="product_specifications_cells"></td>
+        <td class="product_specifications_cells">Part of series</td>
+        <td class="product_specifications_cells" id="series"></td>
         <td class="product_specifications_cells">Illustrations</td>
-        <td class="product_specifications_cells"></td>
+        <td class="product_specifications_cells" id="illustrations"></td>
     </tr>
 </table>
 
@@ -197,6 +138,7 @@
 <br>
 <p id="test"></p>
 <script>
+    let product = JSON.parse('{{product|tojson|safe}}');
     let category = JSON.parse('{{category|tojson}}');
     if(category === 'physical_book') {
         product_specifications_images_book.setAttribute("src","../static/page_count.png");
@@ -208,9 +150,7 @@
         document.getElementById("page_count/length").innerHTML = "Listening time";
         document.getElementById("page_count/length_value").innerHTML = JSON.parse('{{product[25]|tojson}}');
         }
-</script>
 
-<script>
     let reviews = JSON.parse('{{reviews|tojson|safe}}');
     let reviews_cleaned = reviews.reviews
 
@@ -242,9 +182,115 @@
         }
     }
 
+    function add_reviews(reviews){
+        let review_container = document.getElementById("review_divide");
+
+        let counter = 0;
+        let review_pair;
+
+
+        for (let review of reviews){
+
+            if (counter % 2 === 0){
+                review_pair = document.createElement("div");
+                review_pair.classList.add("review_pair");
+                review_container.appendChild(review_pair);
+        }
+
+            let review_box = document.createElement("div");
+            review_box.classList.add("review_sub_divide");
+            let review_span = document.createElement("span");
+            let review_header = document.createElement("h5");
+            let review_text = document.createElement("p");
+            let review_rating = document.createElement("img");
+            review_rating.classList.add("rating_stars");
+
+            review_header.innerHTML = review[3];
+            review_text.innerHTML = review[4];
+
+
+            review_pair.appendChild(review_box);
+            review_box.appendChild(review_span);
+            review_span.appendChild(review_header);
+            for (let i = 0; i < 5; i++){
+                let star = review_rating.cloneNode();
+                if (i < review[5]){
+                    star.setAttribute("src", "../static/yellow_star.png");
+                }
+                else{
+                    star.setAttribute("src", "../static/grey_star.png");
+                }
+                review_box.appendChild(star);
+            }
+            review_box.appendChild(document.createElement("br"));
+            review_box.appendChild(document.createElement("br"));
+            review_box.appendChild(review_text);
+            counter += 1;
+        }
+    }
+
+
+
+
+    function display_similar_products(home_product, products, container){
+        let product_container = document.getElementById(container);
+        for (let product of products){
+            if (home_product[0] === product[0]){
+                continue;
+            }
+            else {
+                let product_div = document.createElement("div");
+                product_div.classList.add("similar_products_sub_div");
+                let product_image = document.createElement("img");
+                product_image.classList.add("similar_products_image");
+                product_image.setAttribute("src", product[6]);
+                let product_link = document.createElement("a");
+                product_link.setAttribute("href", `/product_page/${product[0]}`);
+                product_link.innerHTML = product[1];
+                product_container.appendChild(product_div);
+                product_div.appendChild(product_image);
+                product_div.appendChild(product_link);
+            }
+        }
+    }
+
+    function update_attribute_table(){
+        illustrations = document.getElementById("illustrations");
+        series = document.getElementById("series");
+        if (product[20] === 'True'){
+            illustrations.innerHTML = "Yes";
+        }
+        else{
+            illustrations.innerHTML = "No";
+        }
+        if (product[21] > 0){
+            series.innerHTML = "Yes";
+        }
+        else{
+            series.innerHTML = "No";
+        }
+
+    }
+
+
+    if(same_authors_count = 'not_empty'){
+        let same_author = JSON.parse('{{same_author|tojson|safe}}');
+        let same_author_cleaned = same_author.same_author_products;
+        display_similar_products(product, same_author_cleaned, "same_author_div");
+    }
+
+    if(same_genre_count = 'not_empty'){
+        let same_genre = JSON.parse('{{same_genre|tojson|safe}}');
+        let same_genre_cleaned = same_genre.same_genre_products;
+        display_similar_products(product, same_genre_cleaned, "same_genre_div");
+    }
 
     let average_rating = average_review(reviews_cleaned);
     display_rating(average_rating);
+    add_reviews(reviews_cleaned);
+    update_attribute_table();
+
+
 </script>
 </body>
 </html>
