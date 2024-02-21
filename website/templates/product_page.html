@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link rel = "stylesheet" type = "text/css" href = "../static/product_page.css" />
+    <title>Product page</title>
+</head>
+
+<body id="product_page_format">
+<!-- The header bar below contains the logo, search bar, and account and basket links and should be used globally across the site -->
+<div class ='header_bar'>
+    <img class="header_bar_elements" id="header_bar_logo" src="../static/wmgzon_logo.png" alt="WMGzon logo"/>
+    <input class="header_bar_elements" id="header_bar_search" type="text" placeholder="Search products"/>
+    <div class ="header_bar_elements" style="padding-left: calc(33.3% - 155px)">
+        <a href="/account_page"><img id="header_bar_account" src="../static/account.png" alt="Account" href="../../website/web_pages/account_page.html"/> </a>
+        <a href="/basket"><img id="header_bar_basket" src="../static/basket.png" alt="Basket" href="../../website/web_pages/basket_page.html"/> </a>
+    </div>
+</div>
+
+<!-- The sub-header below contains links to product category pages and should be used globally across the site. -->
+<div class="category_bar">
+    <a class="category_bar_elements" style="background: #b7f1a7" href="/groceries_page.html">Groceries</a>
+    <a class="category_bar_elements" style="background: #c0bcbc" href="/electronics_page.html">Electronics</a>
+    <a class="category_bar_elements" style="background: #d2b8f5" href="/songs_page.html">Songs</a>
+    <a class="category_bar_elements" style="background: #f1a06f" href="/books_page.html">Books</a>
+    <a class="category_bar_elements" style="background: #f1e056" href="/jewellery_page.html">Jewellery</a>
+    <a class="category_bar_elements" style="background: #92f1e1" href="/movies_page.html">Movies</a>
+</div>
+
+<!-- The product page div below contains product attributes for any product which is a book. -->
+<div id="product_page">
+    <img id="product_image" alt="Product image" />
+    <script>
+        let image = JSON.parse('{{product[6]|tojson}}');
+        product_image.setAttribute("src", image)</script>
+    <span style="margin-left:3%; overflow: hidden">
+        <!--The title of the book goes below-->
+        <h3>{{ product[1] }}</h3>
+
+        <!--The rating (using stars) of the book goes below-->
+        <div>
+            <img src="../static/yellow_star.png" alt="Rating" class="rating_stars" id="rating_star_1"/>
+            <img src="../static/yellow_star.png" alt="Rating" class="rating_stars" id="rating_star_2"/>
+            <img src="../static/yellow_star.png" alt="Rating" class="rating_stars" id="rating_star_3"/>
+            <img src="../static/yellow_star.png" alt="Rating" class="rating_stars" id="rating_star_4"/>
+            <img src="../static/grey_star.png" alt="Rating" class="rating_stars" id="rating_star_5"/>
+            <a href="../../website/web_pages_leave_review.html" style="margin-left: 3%">Leave a review</a>
+        </div>
+        <br>
+        <span style="font-size: large">Price: £{{ product[8]}}</span>
+        <span style="margin-left: 15%; font-size:large">Only {{product[5]}} left in stock</span>
+        <br>
+        <br>
+
+        <!--The buttons to toggle between different product formats (ie. audiobook, e-book, etc) go below-->
+        <div>
+            <button class ="product_options">Paperback</button>
+            <button class ="product_options">Hardcover</button>
+            <button class ="product_options">e-book</button>
+            <button class ="product_options">Audiobook</button>
+        </div>
+
+        <br>
+
+        <button id ="add_to_basket">Add to basket</button>
+        <hr>
+        <p style="overflow-x: visible; overflow-y: visible">{{product[14]}}</p>
+        <hr>
+
+        <!--The product attributes go into the below grid- formatted div-->
+        <div class="product_specifications">
+            <p class="product_specifications_text">ISBN</p>
+            <p class="product_specifications_text">Date published</p>
+            <p class="product_specifications_text">Language</p>
+            <p class="product_specifications_text">Author</p>
+            <p class="product_specifications_text" id="page_count/length">n/a</p>
+            <img src="../static/isbn.png" alt="ISBN" class="product_specification_icons" id="product_specifications_images_isbn"/>
+            <img src="../static/calendar.png" alt="Date published" class="product_specification_icons" id="product_specifications_images_calendar"/>
+            <img src="../static/globe.png" alt="Language" class="product_specification_icons" id="product_specifications_images_globe"/>
+            <img src="../static/author.png" alt="Author" class="product_specification_icons" id="product_specifications_images_author"/>
+            <img src="../static/page_count.png" alt="Page count" class="product_specification_icons" id="product_specifications_images_book"/>
+            <p class="product_specifications_text">{{product[19]}}</p>
+            <p class="product_specifications_text">{{product[23]}}</p>
+            <p class="product_specifications_text">{{product[16]}}</p>
+            <p class="product_specifications_text">{{product[12]}}</p>
+            <p class="product_specifications_text" id="page_count/length_value">n/a</p>
+        </div>
+    </span>
+</div>
+<hr style="margin: 3%">
+<h4 style="margin:3%">Product reviews</h4>
+<div id="review_divide">
+    <div class="review_pair">
+        <div class="review_sub_divide">
+            <span>
+                <h5>Review description</h5>
+                <img src="../static/yellow_star.png" alt="Rating" class="rating_stars"/>
+                <img src="../static/yellow_star.png" alt="Rating" class="rating_stars"/>
+                <img src="../static/yellow_star.png" alt="Rating" class="rating_stars"/>
+                <img src="../static/yellow_star.png" alt="Rating" class="rating_stars"/>
+                <img src="../static/grey_star.png" alt="Rating" class="rating_stars"/>
+            </span>
+            <br>
+            <br>
+            <p>Review text- this is the meat of the review- did the customer like it?</p>
+        </div>
+        <div class="review_sub_divide">
+            <span>
+                <h5>Review description</h5>
+                <img src="../static/yellow_star.png" alt="Rating" class="rating_stars"/>
+                <img src="../static/yellow_star.png" alt="Rating" class="rating_stars"/>
+                <img src="../static/yellow_star.png" alt="Rating" class="rating_stars"/>
+                <img src="../static/yellow_star.png" alt="Rating" class="rating_stars"/>
+                <img src="../static/grey_star.png" alt="Rating" class="rating_stars"/>
+            </span>
+            <br>
+            <br>
+            <p>Review text- this is the meat of the review- did the customer like it?</p>
+        </div>
+    </div>
+    <div class="review_sub_divide">
+        <h5>Review description</h5>
+        <p>Review text- this is the meat of the review- did the customer like it?</p>
+    </div>
+    <div class="review_sub_divide">
+        <h5>Review description</h5>
+        <p>Review text- this is the meat of the review- did the customer like it?</p>
+    </div>
+    <div class="review_sub_divide">
+        <h5>Review description</h5>
+        <p>Review text- this is the meat of the review- did the customer like it?</p>
+    </div>
+    <div class="review_sub_divide">
+        <h5>Review description</h5>
+        <p>Review text- this is the meat of the review- did the customer like it?</p>
+    </div>
+    <div class="review_sub_divide">
+        <h5>Review description</h5>
+        <p>Review text- this is the meat of the review- did the customer like it?</p>
+    </div>
+</div>
+
+<hr style="margin: 3%">
+<h4 style="margin-left:3%">Books by the same author:</h4>
+<div class="similar_products">
+    <div class="similar_products_sub_div">
+        <img src="../static/the_agile_samuari.png" alt="The agile samurai" class="similar_products_image"/>
+        <a href="/product_page.html">The agile samurai</a>
+    </div>
+    <div class="similar_products_sub_div">
+        <img src="../static/the_agile_samuari.png" alt="The agile samurai" class="similar_products_image"/>
+        <a href="/product_page.html">The agile samurai</a>
+    </div>
+</div>
+
+<hr style="margin: 3%">
+<h4 style="margin-left:3%">Books in the same genre:</h4>
+<div class="similar_products">
+    <div class="similar_products_sub_div">
+        <img src="../static/the_agile_samuari.png" alt="The agile samurai" class="similar_products_image"/>
+        <a href="/product_page.html">The agile samurai</a>
+    </div>
+</div>
+
+<hr style="margin: 3%">
+<h4 style="margin:3%">Further product information:</h4>
+<table id="product_specification_table">
+    <tr>
+        <th class="product_specifications_cells">Attribute</th>
+        <th class="product_specifications_cells">Value</th>
+        <th class="product_specifications_cells">Attribute</th>
+        <th class="product_specifications_cells">Value</th>
+    </tr>
+    <tr>
+        <td class="product_specifications_cells">Genre</td>
+        <td class="product_specifications_cells"></td>
+        <td class="product_specifications_cells">Dimensions</td>
+        <td class="product_specifications_cells"></td>
+    </tr>
+        <tr>
+        <td class="product_specifications_cells">Media type</td>
+        <td class="product_specifications_cells"></td>
+        <td class="product_specifications_cells">Publisher</td>
+        <td class="product_specifications_cells"></td>
+    </tr>
+        <tr>
+        <td class="product_specifications_cells">Edition</td>
+        <td class="product_specifications_cells"></td>
+        <td class="product_specifications_cells">Illustrations</td>
+        <td class="product_specifications_cells"></td>
+    </tr>
+</table>
+
+<br>
+<br>
+<br>
+<p id="test"></p>
+<script>
+    let category = JSON.parse('{{category|tojson}}');
+    if(category === 'physical_book') {
+        product_specifications_images_book.setAttribute("src","../static/page_count.png");
+        document.getElementById("page_count/length").innerHTML = "Page count";
+        document.getElementById("page_count/length_value").innerHTML = JSON.parse('{{product[28]|tojson}}');
+        }
+    else if(category === 'digital_book') {
+        product_specifications_images_book.setAttribute("src","../static/headphones.png");
+        document.getElementById("page_count/length").innerHTML = "Listening time";
+        document.getElementById("page_count/length_value").innerHTML = JSON.parse('{{product[25]|tojson}}');
+        }
+</script>
+
+<script>
+    let reviews = JSON.parse('{{reviews|tojson|safe}}');
+    let reviews_cleaned = reviews.reviews
+
+    function average_review(reviews) {
+        let sum_reviews = 0;
+        let count_reviews = 0;
+        if(reviews.length > 0) {
+            for (let review of reviews) {
+                sum_reviews += Number(review[5]);
+                count_reviews += 1;
+            }
+            return Math.round(sum_reviews / count_reviews);
+        }
+        else {
+            return 0;
+        }
+    }
+
+    function display_rating(average_rating){
+        for(let i = 1; i < 6; i++){
+            let element = document.getElementById(`rating_star_${i}`);
+            if (average_rating > 0){
+                element.setAttribute("src", "../static/yellow_star.png");
+                average_rating = average_rating - 1;
+            }
+            else{
+                element.setAttribute("src", "../static/grey_star.png");
+            }
+        }
+    }
+
+
+    let average_rating = average_review(reviews_cleaned);
+    display_rating(average_rating);
+</script>
+</body>
+</html>

@@ -1,6 +1,4 @@
-import pytest
-from database_backend import database_table_names as db_tables
-import os
+from website import database_table_names as db_tables
 
 db_tables.Product.delete_record(1)
 db_tables.Product.delete_record(2)

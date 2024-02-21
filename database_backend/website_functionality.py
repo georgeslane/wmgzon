@@ -1,5 +1,5 @@
 import datetime
-import database_table_names as db_tables
+from website import database_table_names as db_tables
 
 
 class Product:
@@ -37,8 +37,10 @@ class Product:
     returns each review as a list."""
     def get_reviews_for_product(self, product_id):
         review_ids = db_tables.Review.get_id_from_any_column(db_tables.Review.table_name, 'product_id', product_id)
+        reviews = []
         for review_id in review_ids:
-            db_tables.Review.get_record(review_id)
+            reviews.append(db_tables.Review.get_record(review_id))
+        return reviews
 
     """The get_products_by_category method returns other products that are in the same category as the 
     product it is called on."""
@@ -47,8 +49,10 @@ class Product:
                                                       'product_category')
         product_ids = db_tables.Product.get_id_from_any_column(db_tables.Product.level_1_table_name,
                                                                'product_category', category)
+        products = []
         for id in product_ids:
-            db_tables.Product.get_record(id)
+            products.append(db_tables.Product.get_record(id))
+            return products
 
     """The add_product_to_list method adds the product it is called on to a specified product list."""
     def add_product_to_list(self, product_id, list_id):
@@ -62,14 +66,14 @@ class ProductBook(Product):
     def add_new_book(self, account_id, product_name, base_price, product_description, product_category,
                      quantity_in_stock, product_image_url, date_added, price, quantity_sold, product_discount, author,
                      media_type, synopsis, genre, language, publisher, edition, isbn, illustrations, series_id,
-                     position_in_series):
+                     position_in_series, date_published):
         permissions = db_tables.Account.get_record_value(db_tables.Account.account_table_name, account_id,
                                                          'permission_id')
         if permissions == ['ADMIN']:
             db_tables.ProductBook.add_book(product_name, base_price, product_description, product_category,
                                            quantity_in_stock, product_image_url, date_added, price, quantity_sold,
                                            product_discount, author, media_type, synopsis, genre, language, publisher, edition,
-                                           isbn, illustrations, series_id, position_in_series)
+                                           isbn, illustrations, series_id, position_in_series, date_published)
         else:
             return 'You do not have the correct permissions to add a product.'
 
@@ -106,12 +110,9 @@ class ProductBook(Product):
 
 
 
-class ProductAudiobook(ProductBook):
+class ProductDigitalBook(ProductBook):
     """Inherits from ProductBook. Contains attributes: length, narrator, dramatised, file_format, storage_size.
     And methods: sample_audiobook"""
-
-class ProductEBook(ProductBook):
-    """Inherits from ProductBook. Contains attributes: file_format, storage_size. And methods: sample_ebook"""
 
 class ProductPhysicalBook(ProductBook):
     """Inherits from ProductBook. Contains attributes: product_condition, product_format, shipping_date.
@@ -122,9 +123,9 @@ class Review:
     And methods: edit_review, delete_review, report_review"""
 
 
-    def add_review(self, product_id, account_id, review_text, review_rating):
+    def add_review(self, product_id, account_id, review_header, review_text, review_rating):
         review_date = datetime.datetime.now()
-        db_tables.Review.add_review(product_id, account_id, review_text, review_rating, review_date)
+        db_tables.Review.add_review(product_id, account_id, review_header, review_text, review_rating, review_date)
 
     def edit_review_rating(self, id, new_rating):
         db_tables.Review.update_record(db_tables.Review.review_table_name, id, 'review_rating', new_rating)
@@ -145,13 +146,13 @@ class ProductList:
     product_ids, account_id.
     And methods: add_product, remove_product, delete_product_list"""
 
-    def __init__(self, product_list_type, product_list_name, product_list_description, account_id ):
-        #self.product_list_id =
-        self.product_list_type = product_list_type
-        self.product_list_name = product_list_name
-        self.product_list_description = product_list_description
-        self.product_ids = []
-        self.account_id = account_id
+    # def __init__(self, product_list_type, product_list_name, product_list_description, account_id ):
+    #     #self.product_list_id =
+    #     self.product_list_type = product_list_type
+    #     self.product_list_name = product_list_name
+    #     self.product_list_description = product_list_description
+    #     self.product_ids = []
+    #     self.account_id = account_id
 
 class Basket(ProductList):
     """Inherits from ProductList. Contains method: purchase_basket"""

@@ -76,6 +76,11 @@ div.category_bar {
     align-items: flex-start;
 }
 
+#product_image{
+    height: 502px;
+    width: auto;
+}
+
 /*The class rating_stars is used to format review stars on the product page*/
 img.rating_stars{
     height:25px;
@@ -107,7 +112,6 @@ button.product_options{
     height: 15%;
     align-content: center;
     place-items: center;
-    background:
 }
 
 /*Aligns product attribute text*/
@@ -144,6 +148,27 @@ button.product_options{
 
 #product_specifications_images_book{
     grid-column: 5
+}
+
+#review_divide{
+    margin-left: 3%;
+    margin-right: 3%;
+    margin-top: 1%;
+    max-height:250px;
+    width:94.5%;
+    overflow-x: hidden;
+    overflow-y: scroll;
+}
+
+div.review_pair{
+    display: inline-flex;
+    margin-top: 1%;
+    margin-bottom: 1%;
+    width:100%;
+}
+
+div.review_sub_divide{
+    width:50%;
 }
 
 /*Sets attributes for the product spec table, such as table layout, etc*/

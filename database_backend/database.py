@@ -12,7 +12,7 @@ class Database:
     It also creates an SqlReader object, which inherits from database_utils.SqliteReader.
     This object stores methods for converting data types and other database utilities."""
     def __init__(self, table_name):
-        self.connection = sqlite3.connect("WMGZON.db")
+        self.connection = sqlite3.connect("WMGZON.db", check_same_thread=False)
         self.cursor = self.connection.cursor()
         self.table_name = table_name
         self.SqlReader = database_utils.SqliteReader()
@@ -124,20 +124,20 @@ class ProductBookDatabase(ProductDatabase):
         self.cursor.execute("CREATE TABLE IF NOT EXISTS " + self.level_2_table_name + " (id INTEGER NOT NULL \
                             PRIMARY KEY, author VARCHAR(64), media_type VARCHAR(64), synopsis CLOB, genre VARCHAR(64), language \
                             VARCHAR(64), publisher VARCHAR(64), edition VARCHAR(64), isbn CHAR(13), illustrations \
-                            BOOLEAN, series_id INTEGER, position_in_series INTEGER)")
+                            BOOLEAN, series_id INTEGER, position_in_series INTEGER, date published DATE)")
         self.connection.commit()
 
     """The add_book method below calls the add_product method from the ProductDatabase class to add a new record to the 
     product table, before also adding a new record to the book table with the same id."""
     def add_book(self, product_name, base_price, product_description, product_category, quantity_in_stock,
                  product_image_url, date_added, price, quantity_sold, product_discount, author, media_type, synopsis, genre,
-                 language, publisher, edition, isbn, illustrations, series_id, position_in_series):
+                 language, publisher, edition, isbn, illustrations, series_id, position_in_series, date_published):
         super().add_product(product_name, base_price, product_description, product_category,
                             quantity_in_stock, product_image_url, date_added, price, quantity_sold, product_discount)
-        self.cursor.execute("INSERT INTO " + self.level_2_table_name + " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        self.cursor.execute("INSERT INTO " + self.level_2_table_name + " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                             ((super().get_new_id(self.level_1_table_name) - 1), author, media_type,
                              synopsis, genre, language, publisher, edition, isbn, illustrations, series_id,
-                             position_in_series))
+                             position_in_series, date_published))
         self.connection.commit()
 
     """The get_record method below overwrites the get_record method from the Database class. 
@@ -186,11 +186,11 @@ class ProductDigitalBookDatabase(ProductBookDatabase):
     def add_digital_book(self, product_name, base_price, product_description, product_category, quantity_in_stock,
                          product_image_url, date_added, price, quantity_sold, product_discount, author, media_type,
                          synopsis, genre, language, publisher, edition, isbn, illustrations, series_id,
-                         position_in_series, length, narrator, dramatised, file_format, storage_size):
+                         position_in_series, date_published, length, narrator, dramatised, file_format, storage_size):
         super().add_book(product_name, base_price, product_description, product_category, quantity_in_stock,
                          product_image_url, date_added, price, quantity_sold, product_discount, author, media_type,
                          synopsis, genre, language, publisher, edition, isbn, illustrations, series_id,
-                         position_in_series)
+                         position_in_series, date_published)
         self.cursor.execute("INSERT INTO " + self.level_3_table_name + " VALUES (?, ?, ?, ?, ?, ?)",
                             ((super().get_new_id(self.level_1_table_name) - 1), length, narrator,
                              dramatised, file_format, storage_size))
@@ -199,11 +199,16 @@ class ProductDigitalBookDatabase(ProductBookDatabase):
     """The get_record method below overwrites the get_record method from the Database class. 
     It returns the joined record from the Product, ProductBook and ProductDigitalBook tables."""
     def get_record(self, id):
-        self.cursor.execute("SELECT * FROM " + self.level_1_table_name + " INNER JOIN " + self.level_2_table_name + " \
-        ON " + self.level_1_table_name + ".id=" + self.level_2_table_name + ".id INNER JOIN \
-        " + self.level_3_table_name + " ON " + self.level_1_table_name + ".id=" + self.level_3_table_name + ".id \
-        WHERE " + self.level_1_table_name + ".id = ?", (self.SqlReader.convert_to_tuple(id)))
-        return self.cursor.fetchall()
+        try:
+            self.cursor.execute("SELECT * FROM " + self.level_1_table_name + " INNER JOIN " + self.level_2_table_name + " \
+            ON " + self.level_1_table_name + ".id=" + self.level_2_table_name + ".id INNER JOIN \
+            " + self.level_3_table_name + " ON " + self.level_1_table_name + ".id=" + self.level_3_table_name + ".id \
+            WHERE " + self.level_1_table_name + ".id = ?", (self.SqlReader.convert_to_tuple(id)))
+            result = self.cursor.fetchall()
+            return self.SqlReader.convert_from_tuple(result)
+
+        except IndexError:
+            'The inputted ID does not exist in the table'
 
     """The delete_record method below overwrites the delete_record method from the Database class. 
     It deletes records of the same id from both the Product, ProductBook and ProductDigitalBook tables."""
@@ -230,7 +235,7 @@ class ProductPhysicalBookDatabase(ProductBookDatabase):
         self.level_1_table_name = level_1_table_name
         self.cursor.execute("CREATE TABLE IF NOT EXISTS " + self.level_3_table_name + " (id INTEGER NOT NULL\
                             PRIMARY KEY, product_condition VARCHAR(16), product_format VARCHAR(32),\
-                            shipping_time INTEGER)")
+                            shipping_time INTEGER, page_count INTEGER)")
         self.connection.commit()
 
     """The add_physical_book method below calls the add_book method from the ProductBookDatabase class to add a new 
@@ -239,24 +244,29 @@ class ProductPhysicalBookDatabase(ProductBookDatabase):
     def add_physical_book(self, product_name, base_price, product_description, product_category, quantity_in_stock,
                           product_image_url, date_added, price, quantity_sold, product_discount, author, media_type,
                           synopsis, genre, language, publisher, edition, isbn, illustrations, series_id,
-                          position_in_series, product_condition, product_format, shipping_time):
+                          position_in_series, date_published, product_condition, product_format, shipping_time, page_count):
         super().add_book(product_name, base_price, product_description, product_category, quantity_in_stock,
                          product_image_url, date_added, price, quantity_sold, product_discount, author, media_type,
                          synopsis, genre, language, publisher, edition, isbn, illustrations, series_id,
-                         position_in_series)
-        self.cursor.execute("INSERT INTO " + self.level_3_table_name + " VALUES (?, ?, ?, ?)",
+                         position_in_series, date_published)
+        self.cursor.execute("INSERT INTO " + self.level_3_table_name + " VALUES (?, ?, ?, ?, ?)",
                             ((super().get_new_id(self.level_1_table_name) - 1), product_condition,
-                             product_format, shipping_time))
+                             product_format, shipping_time, page_count))
         self.connection.commit()
 
     """The get_record method below overwrites the get_record method from the Database class. 
     It returns the joined record from the Product, ProductBook and ProductPhysicalBook tables."""
     def get_record(self, id):
-        self.cursor.execute("SELECT * FROM " + self.level_1_table_name + " INNER JOIN " + self.level_2_table_name + " \
-        ON " + self.level_1_table_name + ".id=" + self.level_2_table_name + ".id INNER JOIN \
-        " + self.level_3_table_name + " ON " + self.level_1_table_name + ".id=" + self.level_3_table_name + ".id \
-        WHERE " + self.level_1_table_name + ".id = ?", (self.SqlReader.convert_to_tuple(id)))
-        return self.cursor.fetchall()
+        try:
+            self.cursor.execute("SELECT * FROM " + self.level_1_table_name + " INNER JOIN " + self.level_2_table_name + " \
+            ON " + self.level_1_table_name + ".id=" + self.level_2_table_name + ".id INNER JOIN \
+            " + self.level_3_table_name + " ON " + self.level_1_table_name + ".id=" + self.level_3_table_name + ".id \
+            WHERE " + self.level_1_table_name + ".id = ?", (self.SqlReader.convert_to_tuple(id)))
+            result = self.cursor.fetchall()
+            return self.SqlReader.convert_from_tuple(result)
+
+        except IndexError:
+            'The inputted ID does not exist in the table'
 
     """The delete_record method below overwrites the delete_record method from the Database class. 
     It deletes records of the same id from both the Product, ProductBook and ProductPhysicalBook tables."""
@@ -382,14 +392,14 @@ class ReviewDatabase(Database):
         self.review_table_name = review_table_name
         super().__init__(review_table_name)
         self.cursor.execute("CREATE TABLE IF NOT EXISTS " + self.review_table_name + " (id INTEGER NOT NULL \
-        PRIMARY KEY, product_id INTEGER NOT NULL, account_id INTEGER NOT NULL, review_text CLOB, review_rating INTEGER \
+        PRIMARY KEY, product_id INTEGER NOT NULL, account_id INTEGER NOT NULL, review_header VARCHAR(64), review_text CLOB, review_rating INTEGER \
         NOT NULL, review_date DATE)")
         self.connection.commit()
 
     """The add_review method inserts a new record into the review_table when called."""
-    def add_review(self, product_id, account_id, review_text, review_rating, datetime):
-        self.cursor.execute("INSERT INTO " + self.review_table_name + " VALUES (?, ?, ?, ?, ?, ?)",
-                            (self.get_new_id(self.review_table_name), product_id, account_id, review_text,
+    def add_review(self, product_id, account_id, review_header, review_text, review_rating, datetime):
+        self.cursor.execute("INSERT INTO " + self.review_table_name + " VALUES (?, ?, ?, ?, ?, ?, ?)",
+                            (self.get_new_id(self.review_table_name), product_id, account_id, review_header, review_text,
                              review_rating, datetime))
         self.connection.commit()
 

@@ -1,4 +1,5 @@
 from database_backend import database
+from database_backend import website_functionality as wf
 
 Product = database.ProductDatabase('TEST_PRODUCT')
 ProductBook = database.ProductBookDatabase('TEST_PRODUCT', 'TEST_PRODUCT_BOOK')
@@ -10,3 +11,16 @@ PaymentMethod = database.PaymentMethodDatabase('TEST_PAYMENT_METHOD')
 DeliveryMethod = database.DeliveryMethodDatabase('TEST_DELIVERY_METHOD')
 ProductList = database.ProductListDatabase('TEST_PRODUCT_LIST')
 ProductListItems = database.ProductListItemsDatabase('TEST_PRODUCT_LIST_ITEMS')
+
+ProductFunctions = wf.Product()
+AccountFunctions = wf.Account()
+ReviewFunctions = wf.Review()
+ProductBookFunctions = wf.ProductBook()
+ProductDigitalBookFunctions = wf.ProductDigitalBook()
+ProductPhysicalBookFunctions = wf.ProductPhysicalBook()
+ProductListFunctions = wf.ProductList()
+BasketFunctions = wf.Basket()
+CustomerFunctions = wf.AccountCustomer()
+AdminFunctions = wf.AccountAdmin()
+DeliveryMethodFunctions = wf.DeliveryMethod()
+PaymentMethodFunctions = wf.PaymentMethod()
