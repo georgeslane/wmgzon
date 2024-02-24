@@ -11,7 +11,7 @@
 <!-- The header bar below contains the logo, search bar, and account and basket links and should be used globally across the site -->
 <div class ='header_bar'>
     <img class="header_bar_elements" id="header_bar_logo" src="../static/wmgzon_logo.png" alt="WMGzon logo"/>
-    <input class="header_bar_elements" id="header_bar_search" type="text" placeholder="Search products"/>
+    <form action="{{url_for('search')}}" method="post"><input class="header_bar_elements" id="header_bar_search" type="text" placeholder="Search products" name="search_string"/></form>
     <div class ="header_bar_elements" style="padding-left: calc(33.3% - 155px)">
         <a href="/account_page"><img id="header_bar_account" src="../static/account.png" alt="Account" href="../../website/web_pages/account_page.html"/> </a>
         <a href="/basket"><img id="header_bar_basket" src="../static/basket.png" alt="Basket" href="../../website/web_pages/basket_page.html"/> </a>
@@ -20,12 +20,12 @@
 
 <!-- The sub-header below contains links to product category pages and should be used globally across the site. -->
 <div class="category_bar">
-    <a class="category_bar_elements" style="background: #b7f1a7" href="/groceries_page.html">Groceries</a>
-    <a class="category_bar_elements" style="background: #c0bcbc" href="/electronics_page.html">Electronics</a>
-    <a class="category_bar_elements" style="background: #d2b8f5" href="/songs_page.html">Songs</a>
-    <a class="category_bar_elements" style="background: #f1a06f" href="/books_page.html">Books</a>
-    <a class="category_bar_elements" style="background: #f1e056" href="/jewellery_page.html">Jewellery</a>
-    <a class="category_bar_elements" style="background: #92f1e1" href="/movies_page.html">Movies</a>
+    <a class="category_bar_elements" style="background: rgba(183,241,167,0.5)" href="/groceries_page.html">Groceries</a>
+    <a class="category_bar_elements" style="background: rgba(192,188,188,0.5)" href="/electronics_page.html">Electronics</a>
+    <a class="category_bar_elements" style="background: rgba(210,184,245,0.5)" href="/songs_page.html">Songs</a>
+    <a class="category_bar_elements" style="background: rgba(241,160,111,0.5)" href="/books_page.html">Books</a>
+    <a class="category_bar_elements" style="background: rgba(241,224,86,0.5)" href="/jewellery_page.html">Jewellery</a>
+    <a class="category_bar_elements" style="background: rgba(146,241,225,0.5)" href="/movies_page.html">Movies</a>
 </div>
 
 <!-- The product page div below contains product attributes for any product which is a book. -->
@@ -138,17 +138,18 @@
 <br>
 <p id="test"></p>
 <script>
-    let product = JSON.parse('{{product|tojson|safe}}');
+    let product = JSON.parse('{{product_dict|tojson|safe}}');
+    let product_cleaned = product.attributes;
     let category = JSON.parse('{{category|tojson}}');
     if(category === 'physical_book') {
         product_specifications_images_book.setAttribute("src","../static/page_count.png");
         document.getElementById("page_count/length").innerHTML = "Page count";
-        document.getElementById("page_count/length_value").innerHTML = JSON.parse('{{product[28]|tojson}}');
+        document.getElementById("page_count/length_value").innerHTML = product_cleaned[28];
         }
     else if(category === 'digital_book') {
         product_specifications_images_book.setAttribute("src","../static/headphones.png");
         document.getElementById("page_count/length").innerHTML = "Listening time";
-        document.getElementById("page_count/length_value").innerHTML = JSON.parse('{{product[25]|tojson}}');
+        document.getElementById("page_count/length_value").innerHTML = product_cleaned[25];
         }
 
     let reviews = JSON.parse('{{reviews|tojson|safe}}');
@@ -276,13 +277,13 @@
     if(same_authors_count = 'not_empty'){
         let same_author = JSON.parse('{{same_author|tojson|safe}}');
         let same_author_cleaned = same_author.same_author_products;
-        display_similar_products(product, same_author_cleaned, "same_author_div");
+        display_similar_products(product_cleaned, same_author_cleaned, "same_author_div");
     }
 
     if(same_genre_count = 'not_empty'){
         let same_genre = JSON.parse('{{same_genre|tojson|safe}}');
         let same_genre_cleaned = same_genre.same_genre_products;
-        display_similar_products(product, same_genre_cleaned, "same_genre_div");
+        display_similar_products(product_cleaned, same_genre_cleaned, "same_genre_div");
     }
 
     let average_rating = average_review(reviews_cleaned);

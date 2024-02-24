@@ -25,6 +25,15 @@ class SqliteReader():
             output_list.append(item[0])
         return output_list
 
+    """The 'convert_from_large_tuples_in_large_lists' method takes a list of multiple tuples, 
+    each containing multiple values, and retuns a nested list."""
+    def convert_from_large_tuples_in_large_lists(self, input):
+        output_nested_list = []
+        for tuple in input:
+            output_nested_list.append(list(tuple))
+        return output_nested_list
+
+
 
 
 class AccountSecurity():

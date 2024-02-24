@@ -103,11 +103,13 @@ class ProductDatabase(Database):
 
     """The search_products method below takes a search term as an argument and returns records that have a matching 
     name or category from the product table."""
-    def search_products(self, search_term):
-        self.cursor.execute("SELECT id FROM " + self.level_1_table_name + " WHERE product_name LIKE '%" + search_term
-                            + "%' OR product_category LIKE '%" + search_term + "%'")
+    def search_products(self, search_term, table_2):
+        self.cursor.execute("SELECT t1.id, t1.product_name, t1.product_image_url, t1.product_description, t1.product_category, \
+        t1.date_added, t1.price, t2.id, t2.author, t2.media_type, t2.genre, t2.language, t2.publisher, \
+        t2.illustrations, t2.date FROM " + self.level_1_table_name + " AS t1 LEFT JOIN " + table_2 + " AS t2 ON t1.id = t2.id WHERE t1.product_name LIKE '%" + search_term + "%' OR \
+        t1.product_category LIKE '%" + search_term + "%'")
         results = self.cursor.fetchall()
-        results = self.SqlReader.convert_from_plural_tuples(results)
+        results = self.SqlReader.convert_from_large_tuples_in_large_lists(results)
         return results
 
 

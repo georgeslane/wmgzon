@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Search page</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="../static/search_page.css"/>
+</head>
+<body id="search_page_format">
+
+<div class ='header_bar'>
+    <img class="header_bar_elements" id="header_bar_logo" src="../static/wmgzon_logo.png" alt="WMGzon logo"/>
+    <form action="{{url_for('search')}}" method="post"><input class="header_bar_elements" id="header_bar_search" type="text" placeholder="Search products" name="search_string"/></form>
+    <div class ="header_bar_elements" style="padding-left: calc(33.3% - 155px)">
+        <a href="/account_page"><img id="header_bar_account" src="../static/account.png" alt="Account" href="../../website/web_pages/account_page.html"/> </a>
+        <a href="/basket"><img id="header_bar_basket" src="../static/basket.png" alt="Basket" href="../../website/web_pages/basket_page.html"/> </a>
+    </div>
+</div>
+
+<!-- The sub-header below contains links to product category pages and should be used globally across the site. -->
+<div class="category_bar">
+    <a class="category_bar_elements" style="background: rgba(183,241,167,0.5)" href="/groceries_page.html">Groceries</a>
+    <a class="category_bar_elements" style="background: rgba(192,188,188,0.5)" href="/electronics_page.html">Electronics</a>
+    <a class="category_bar_elements" style="background: rgba(210,184,245,0.5)" href="/songs_page.html">Songs</a>
+    <a class="category_bar_elements" style="background: rgba(241,160,111,0.5)" href="/books_page.html">Books</a>
+    <a class="category_bar_elements" style="background: rgba(241,224,86,0.5)" href="/jewellery_page.html">Jewellery</a>
+    <a class="category_bar_elements" style="background: rgba(146,241,225,0.5)" href="/movies_page.html">Movies</a>
+</div>
+
+<!-- The divide below contains the content for the entire page -->
+<div id="search_area">
+
+    <!--The divide below contains the search filters which sit on the left hand side of the page -->
+    <div id="search_filters">
+
+    </div>
+
+    <!--The divide below contains the search results which sit on the right hand side of the page -->
+    <div id="search_results">
+
+    </div>
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body>
+<script>
+    let search_results = JSON.parse('{{search_results|tojson|safe}}');
+    search_results_cleaned = search_results.search_results;
+
+
+
+    function display_search_results(search_results){
+        let search_results_divide = document.getElementById("search_results");
+        for (let product of search_results){
+            let search_result_link = document.createElement("a");
+            let search_result_module = document.createElement("div");
+            let search_result_image = document.createElement("img");
+            let search_result_attributes = document.createElement("div");
+            let search_result_title = document.createElement("h5");
+            let search_result_price = document.createElement("h6");
+            search_result_module.classList.add('search_result_module');
+            search_result_image.classList.add('search_result_image');
+            search_result_attributes.classList.add('search_result_attributes');
+            search_result_link.href = `product/${product[0]}`;
+            search_result_image.src = product[2];
+            search_result_image.alt = product[1];
+            search_result_title.innerHTML = product[1];
+            search_result_price.innerHTML = "£" + product[6];
+            search_results_divide.appendChild(search_result_link);
+            search_result_link.appendChild(search_result_module);
+            search_result_module.appendChild(search_result_image);
+            search_result_module.appendChild(search_result_attributes);
+            search_result_attributes.appendChild(search_result_title);
+            search_result_attributes.appendChild(search_result_price);
+        }
+    }
+
+
+
+    display_search_results(search_results_cleaned);
+</script>
+</html>

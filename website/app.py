@@ -1,16 +1,18 @@
-from flask import Flask, render_template
+import secrets
+from flask import Flask, render_template, url_for, redirect, request
 from website import database_table_names as db
 import json
+from forms import ProductForm
+import secrets
 
 # db.ProductPhysicalBook.add_physical_book("The Alchemist", 12.99, "A philosophical novel about a shepherd named Santiago who travels from Spain to Egypt in search of a treasure.", "Book", 150, "https://m.media-amazon.com/images/I/81fiotccNCL._AC_UF894,1000_QL80_.jpg", "2023-07-10", 9.99, 700, 0.23, "Paulo Coelho", "Paperback", "The Alchemist follows Santiago, a young shepherd who dreams of finding treasure. Along the journey, he learns about life, love, and the importance of following one's dreams.", "Fiction, Philosophy", "English", "HarperOne", "25th Anniversary Edition", "9780062315007", False, 0, 0, "2020-05-04", "New", "Mass Market Paperback", 4, 600)
 db.Review.add_review(1, 1, "This book is great", "This is a life changing experience", 3, "2020-04-04")
 
 
 app = Flask(__name__)
-
-@app.route('/')
-def home():
-   id = 1
+app.config['SECRET_KEY'] = secrets.token_hex(64)
+@app.route('/product/<int:id>')
+def product(id):
    category = ""
    if db.Product.get_record(id)[4].lower() == "book":
       if db.ProductBook.get_record(id)[13].lower() == "physical" or db.ProductBook.get_record(id)[13].lower() == "paperback" or db.ProductBook.get_record(id)[13].lower() == "hardcover":
@@ -25,7 +27,7 @@ def home():
    else:
       product = db.Product.get_record(id)
       category = 'other'
-   product_dict = {'product': product}
+   product_dict = {'attributes': product}
 
    reviews = db.ProductFunctions.get_reviews_for_product(id)
    reviews_dict = {'reviews': reviews}
@@ -47,6 +49,20 @@ def home():
                           reviews=reviews_dict, same_author=same_author_products_dict,
                           same_genre=same_genre_products_dict, same_genre_count=same_genre_count,
                           same_authors_count=same_authors_count)
+
+
+
+@app.route('/search', methods=['POST'])
+def search():
+
+
+   search_string = request.form['search_string']
+   search_results = db.ProductBook.search_products(search_string, db.ProductBook.level_2_table_name)
+   search_results_dict = {'search_results': search_results}
+
+   return render_template('search_page.html', search_results=search_results_dict)
+
+
 if __name__ == '__main__':
    app.run(debug=True)
 
