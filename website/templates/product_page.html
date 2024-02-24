@@ -11,7 +11,7 @@
 <!-- The header bar below contains the logo, search bar, and account and basket links and should be used globally across the site -->
 <div class ='header_bar'>
     <img class="header_bar_elements" id="header_bar_logo" src="../static/wmgzon_logo.png" alt="WMGzon logo"/>
-    <form action="{{url_for('search')}}" method="post"><input class="header_bar_elements" id="header_bar_search" type="text" placeholder="Search products" name="search_string"/></form>
+    <form action="{{url_for('search')}}" method="post" class="header_bar_elements"><input id="header_bar_search" type="text" placeholder="Search products" name="search_string"/></form>
     <div class ="header_bar_elements" style="padding-left: calc(33.3% - 155px)">
         <a href="/account_page"><img id="header_bar_account" src="../static/account.png" alt="Account" href="../../website/web_pages/account_page.html"/> </a>
         <a href="/basket"><img id="header_bar_basket" src="../static/basket.png" alt="Basket" href="../../website/web_pages/basket_page.html"/> </a>
@@ -30,13 +30,10 @@
 
 <!-- The product page div below contains product attributes for any product which is a book. -->
 <div id="product_page">
-    <img id="product_image" alt="Product image" />
-    <script>
-        let image = JSON.parse('{{product[6]|tojson}}');
-        product_image.setAttribute("src", image)</script>
+    <img id="product_image" alt="Product image"/>
     <span style="margin-left:3%; overflow: hidden">
         <!--The title of the book goes below-->
-        <h3>{{ product[1] }}</h3>
+        <h3>{{ product['product_data'][1] }}</h3>
 
         <!--The rating (using stars) of the book goes below-->
         <div>
@@ -48,8 +45,8 @@
             <a href="../../website/web_pages_leave_review.html" style="margin-left: 3%">Leave a review</a>
         </div>
         <br>
-        <span style="font-size: large">Price: £{{ product[8]}}</span>
-        <span style="margin-left: 15%; font-size:large">Only {{product[5]}} left in stock</span>
+        <span style="font-size: large">Price: £{{ product['product_data'][8]}}</span>
+        <span style="margin-left: 15%; font-size:large">Only {{product['product_data'][5]}} left in stock</span>
         <br>
         <br>
 
@@ -65,7 +62,7 @@
 
         <button id ="add_to_basket">Add to basket</button>
         <hr>
-        <p style="overflow-x: visible; overflow-y: visible">{{product[14]}}</p>
+        <p style="overflow-x: visible; overflow-y: visible">{{product['product_data'][14]}}</p>
         <hr>
 
         <!--The product attributes go into the below grid- formatted div-->
@@ -80,10 +77,10 @@
             <img src="../static/globe.png" alt="Language" class="product_specification_icons" id="product_specifications_images_globe"/>
             <img src="../static/author.png" alt="Author" class="product_specification_icons" id="product_specifications_images_author"/>
             <img src="../static/page_count.png" alt="Page count" class="product_specification_icons" id="product_specifications_images_book"/>
-            <p class="product_specifications_text">{{product[19]}}</p>
-            <p class="product_specifications_text">{{product[23]}}</p>
-            <p class="product_specifications_text">{{product[16]}}</p>
-            <p class="product_specifications_text">{{product[12]}}</p>
+            <p class="product_specifications_text">{{product['product_data'][19]}}</p>
+            <p class="product_specifications_text">{{product['product_data'][23]}}</p>
+            <p class="product_specifications_text">{{product['product_data'][16]}}</p>
+            <p class="product_specifications_text">{{product['product_data'][12]}}</p>
             <p class="product_specifications_text" id="page_count/length_value">n/a</p>
         </div>
     </span>
@@ -95,12 +92,12 @@
 </div>
 
 <hr style="margin: 3%">
-<h4 style="margin-left:3%">Other books by {{product[12]}}:</h4>
+<h4 style="margin-left:3%">Other books by {{product['product_data'][12]}}:</h4>
 <div class="similar_products"  id ="same_author_div">
 </div>
 
 <hr style="margin: 3%">
-<h4 style="margin-left:3%">Other books in {{product[15]}}:</h4>
+<h4 style="margin-left:3%">Other books in {{product['product_data'][15]}}:</h4>
 <div class="similar_products" id="same_genre_div">
 </div>
 
@@ -115,15 +112,15 @@
     </tr>
     <tr>
         <td class="product_specifications_cells">Genre</td>
-        <td class="product_specifications_cells">{{product[15]}}</td>
+        <td class="product_specifications_cells">{{product['product_data'][15]}}</td>
         <td class="product_specifications_cells">Publisher</td>
-        <td class="product_specifications_cells">{{product[17]}}</td>
+        <td class="product_specifications_cells">{{product['product_data'][17]}}</td>
     </tr>
         <tr>
         <td class="product_specifications_cells">Media type</td>
-        <td class="product_specifications_cells">{{product[13]}}</td>
+        <td class="product_specifications_cells">{{product['product_data'][13]}}</td>
         <td class="product_specifications_cells">Edition</td>
-        <td class="product_specifications_cells">{{product[18]}}</td>
+        <td class="product_specifications_cells">{{product['product_data'][18]}}</td>
     </tr>
         <tr>
         <td class="product_specifications_cells">Part of series</td>
@@ -138,22 +135,25 @@
 <br>
 <p id="test"></p>
 <script>
-    let product = JSON.parse('{{product_dict|tojson|safe}}');
-    let product_cleaned = product.attributes;
-    let category = JSON.parse('{{category|tojson}}');
+    let product = JSON.parse('{{product|tojson|safe}}');
+    let product_attributes = product.product_data;
+    let category = product.category;
+    let product_reviews = product.reviews;
+    let books_by_same_author = product.matching_author_products;
+    let books_in_same_genre = product.matching_genre_products;
+
+
     if(category === 'physical_book') {
         product_specifications_images_book.setAttribute("src","../static/page_count.png");
         document.getElementById("page_count/length").innerHTML = "Page count";
-        document.getElementById("page_count/length_value").innerHTML = product_cleaned[28];
+        document.getElementById("page_count/length_value").innerHTML = product_attributes[28];
         }
     else if(category === 'digital_book') {
         product_specifications_images_book.setAttribute("src","../static/headphones.png");
         document.getElementById("page_count/length").innerHTML = "Listening time";
-        document.getElementById("page_count/length_value").innerHTML = product_cleaned[25];
+        document.getElementById("page_count/length_value").innerHTML = product_attributes[25];
         }
 
-    let reviews = JSON.parse('{{reviews|tojson|safe}}');
-    let reviews_cleaned = reviews.reviews
 
     function average_review(reviews) {
         let sum_reviews = 0;
@@ -246,7 +246,7 @@
                 product_image.classList.add("similar_products_image");
                 product_image.setAttribute("src", product[6]);
                 let product_link = document.createElement("a");
-                product_link.setAttribute("href", `/product_page/${product[0]}`);
+                product_link.setAttribute("href", `/product/${product[0]}`);
                 product_link.innerHTML = product[1];
                 product_container.appendChild(product_div);
                 product_div.appendChild(product_image);
@@ -258,13 +258,13 @@
     function update_attribute_table(){
         illustrations = document.getElementById("illustrations");
         series = document.getElementById("series");
-        if (product[20] === 'True'){
+        if (product_attributes[20] === 'True'){
             illustrations.innerHTML = "Yes";
         }
         else{
             illustrations.innerHTML = "No";
         }
-        if (product[21] > 0){
+        if (product_attributes[21] > 0){
             series.innerHTML = "Yes";
         }
         else{
@@ -274,22 +274,16 @@
     }
 
 
-    if(same_authors_count = 'not_empty'){
-        let same_author = JSON.parse('{{same_author|tojson|safe}}');
-        let same_author_cleaned = same_author.same_author_products;
-        display_similar_products(product_cleaned, same_author_cleaned, "same_author_div");
-    }
 
-    if(same_genre_count = 'not_empty'){
-        let same_genre = JSON.parse('{{same_genre|tojson|safe}}');
-        let same_genre_cleaned = same_genre.same_genre_products;
-        display_similar_products(product_cleaned, same_genre_cleaned, "same_genre_div");
-    }
+    display_similar_products(product_attributes, books_by_same_author, "same_author_div");
 
-    let average_rating = average_review(reviews_cleaned);
+    display_similar_products(product_attributes, books_in_same_genre, "same_genre_div");
+
+    let average_rating = average_review(product_reviews);
     display_rating(average_rating);
-    add_reviews(reviews_cleaned);
+    add_reviews(product_reviews);
     update_attribute_table();
+    document.getElementById('product_image').setAttribute("src", product_attributes[6])
 
 
 </script>
