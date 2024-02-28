@@ -42,18 +42,10 @@ class AccountSecurity():
     using the bcrypt.hashpw function."""
     def hash_password(self, password, salt):
         password = password.encode('utf-8')
-        salt = salt.encode('utf-8')
-        return bcrypt.hashpw(password, salt)
+        return bcrypt.hashpw(password=password, salt=salt)
 
     def generate_salt(self):
-        char_list = string.ascii_lowercase
-        salt = ''
-        while len(salt) < 8:
-            for char in char_list:
-                if random.randint(0, 100) == 0:
-                    salt = salt + char
-                    continue
-                else:
-                    pass
+          return bcrypt.gensalt()
+
 
 

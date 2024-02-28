@@ -106,7 +106,7 @@ class ProductDatabase(Database):
     def search_products(self, search_term, table_2):
         self.cursor.execute("SELECT t1.id, t1.product_name, t1.product_image_url, t1.product_description, t1.product_category, \
         t1.date_added, t1.price, t2.id, t2.author, t2.media_type, t2.genre, t2.language, t2.publisher, \
-        t2.illustrations, t2.date FROM " + self.level_1_table_name + " AS t1 LEFT JOIN " + table_2 + " AS t2 ON t1.id = t2.id WHERE t1.product_name LIKE '%" + search_term + "%' OR \
+        t2.illustrations, t2.date, t1.quantity_in_stock, t1.product_discount FROM " + self.level_1_table_name + " AS t1 LEFT JOIN " + table_2 + " AS t2 ON t1.id = t2.id WHERE t1.product_name LIKE '%" + search_term + "%' OR \
         t1.product_category LIKE '%" + search_term + "%'")
         results = self.cursor.fetchall()
         results = self.SqlReader.convert_from_large_tuples_in_large_lists(results)
@@ -294,7 +294,7 @@ class AccountDatabase(Database):
         self.password_table_name = password_table_name
         super().__init__(account_table_name)
         self.cursor.execute("CREATE TABLE IF NOT EXISTS " + self.account_table_name + " (id INTEGER NOT NULL \
-        PRIMARY KEY, username VARCHAR(64) NOT NULL, email VARCHAR(64), permission_id VARCHAR(16) NOT NULL)")
+        PRIMARY KEY, username VARCHAR(64) NOT NULL, email VARCHAR(64), permission_id VARCHAR(16) NOT NULL, salt BLOB NOT NULL)")
         self.cursor.execute("CREATE TABLE IF NOT EXISTS " + self.password_table_name + " \
         (id INTEGER NOT NULL PRIMARY KEY, hashed_passwords VARCHAR(64) NOT NULL)")
         self.connection.commit()
@@ -302,12 +302,12 @@ class AccountDatabase(Database):
 
     """The add_account method below inserts a new record into the account table and password table when called."""
     def add_account(self, username, email, permission_id, password):
-        self.cursor.execute("INSERT INTO " + self.table_name + " VALUES (?, ?, ?, ?)",
-                            (super().get_new_id(self.account_table_name), username, email, permission_id))
+        salt = self.AccountSecurity.generate_salt()
+        self.cursor.execute("INSERT INTO " + self.table_name + " VALUES (?, ?, ?, ?, ?)",
+                            (super().get_new_id(self.account_table_name), username, email, permission_id, salt))
         self.cursor.execute("INSERT INTO " + self.password_table_name + " VALUES (?, ?)",
                             (super().get_new_id(self.account_table_name) - 1,
-                             self.AccountSecurity.hash_password(password,
-                                                                super().get_new_id(self.account_table_name) - 1)))
+                             self.AccountSecurity.hash_password(password, salt)))
         self.connection.commit()
 
     """The get_id_from_username method below takes a username as argument and returns the database id associated 
@@ -332,7 +332,8 @@ class AccountDatabase(Database):
     def compare_passwords(self, password, id):
         stored_password = self.cursor.execute("SELECT hashed_passwords FROM " + self.password_table_name + "WHERE id = \
         ?", self.SqlReader.convert_to_tuple(id))
-        if stored_password == self.AccountSecurity.hash_password(password, id):
+        salt = self.cursor.execute("SELECT salt FROM " + self.account_table_name + "WHERE id = ?", self.SqlReader.convert_to_tuple(id))
+        if stored_password == self.AccountSecurity.hash_password(password, salt):
             return True
         else:
             return False

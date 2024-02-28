@@ -60,11 +60,16 @@
     let search_results = JSON.parse('{{search_results|tojson|safe}}');
     search_items = search_results.search_results;
     average_ratings = search_results.average_ratings;
+    unique_categories = search_results.unique_categories;
+    unique_genres = search_results.unique_genres;
+    unique_authors = search_results.unique_authors;
+    unique_media_types = search_results.unique_media_types;
 
 
 
     function display_search_results(search_results){
         let search_results_divide = document.getElementById("search_results");
+        let counter = 0;
         for (let product of search_results){
             let search_result_link = document.createElement("a");
             let search_result_module = document.createElement("div");
@@ -72,25 +77,84 @@
             let search_result_attributes = document.createElement("div");
             let search_result_title = document.createElement("h5");
             let search_result_price = document.createElement("h6");
+            let search_result_rating = document.createElement("span");
+            let search_result_stock = document.createElement("h6");
+            let search_result_category = document.createElement("h6");
             search_result_module.classList.add('search_result_module');
             search_result_image.classList.add('search_result_image');
             search_result_attributes.classList.add('search_result_attributes');
+            search_result_link.classList.add('search_result_link');
             search_result_link.href = `product/${product[0]}`;
             search_result_image.src = product[2];
             search_result_image.alt = product[1];
             search_result_title.innerHTML = product[1];
-            search_result_price.innerHTML = "£" + product[6];
+            search_result_price.innerHTML = "£" + product[6] + " | " + product[16]*100 + "% off";
+            search_result_stock.innerHTML = "Only " + product[15] + " left in stock";
+            search_result_category.innerHTML = "Category: " + product[4];
             search_results_divide.appendChild(search_result_link);
             search_result_link.appendChild(search_result_module);
             search_result_module.appendChild(search_result_image);
             search_result_module.appendChild(search_result_attributes);
             search_result_attributes.appendChild(search_result_title);
+            search_result_attributes.appendChild(document.createElement('br'));
             search_result_attributes.appendChild(search_result_price);
+            search_result_attributes.appendChild(document.createElement('br'));
+            search_result_attributes.appendChild(search_result_stock);
+            search_result_attributes.appendChild(document.createElement('br'));
+            search_result_attributes.appendChild(search_result_category);
+            search_result_attributes.appendChild(document.createElement('br'));
+            search_result_attributes.appendChild(search_result_rating);
+            display_rating(average_ratings[counter][1], search_result_rating);
+            counter += 1;
+        }
+    }
+
+    function display_filters(unique_list, list_heading){
+        let filter_form = document.createElement('div');
+        filter_form.classList.add('filter_form');
+        let filter_heading = document.createElement('h5');
+        filter_heading.innerHTML = list_heading;
+        document.getElementById('search_filters').appendChild(filter_form);
+        filter_form.appendChild(filter_heading);
+        for (let item of unique_list){
+            let filter_option = document.createElement('div');
+            let filter_checkbox = document.createElement('input');
+            filter_checkbox.setAttribute('type', 'radio');
+            filter_checkbox.setAttribute('name', item);
+            filter_checkbox.setAttribute('id', list_heading + item);
+            let filter_label = document.createElement('label');
+            filter_label.setAttribute('for', list_heading + item);
+            filter_label.innerHTML = item;
+            filter_form.appendChild(filter_option);
+            filter_option.appendChild(filter_checkbox);
+            filter_option.appendChild(filter_label);
+        }
+    }
+
+
+    function display_rating(average_rating, parent_element){
+        for (let i = 1; i <= average_rating; i++){
+            let star = document.createElement('img');
+            star.src = "../static/yellow_star.png";
+            star.classList.add('rating_stars');
+            parent_element.appendChild(star);
+        }
+        for(let j = 1; j <= 5 - average_rating; j++){
+            let star = document.createElement('img');
+            star.src = "../static/grey_star.png";
+            star.classList.add('rating_stars');
+            parent_element.appendChild(star);
         }
     }
 
 
 
     display_search_results(search_items);
+    display_filters(search_results.unique_genres, "Genre");
+    display_filters(search_results.unique_authors, "Authors");
+    display_filters(search_results.unique_media_types, "Media types");
+    display_filters(search_results.unique_categories, "Categories");
+    display_filters(search_resuults.unique_languages, "Languages");
+
 </script>
 </html>

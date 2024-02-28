@@ -28,6 +28,7 @@ def search():
    search_string = request.form['search_string']
    db.SearchFunctions.search_products(search_string, search_dict)
    db.SearchFunctions.get_average_rating(search_dict['search_results'], search_dict)
+   db.SearchFunctions.get_unique_values_from_search(search_dict, search_dict['search_results'])
 
    return render_template('search_page.html', search_results=search_dict)
 

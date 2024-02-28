@@ -11,6 +11,13 @@ from website import database_table_names as db
 #                                        , '2023-07-10', 8, 1000, 0.33, 'JRR Tolkien', 'Ebook',
 #                                        'A brave tale of hobbits wandering through a desolate wilderness in a brave attempt to destroy a ring of power',
 #                                        'Fantasy', 'English', 'HarperCollins', '1st Edition', '9780261102385', False, 0, 0, '2020-05-04', 200, 'Stephen Fry', False, 'pdf', 600)
+#
+# db.Product.update_record(db.Product.level_1_table_name, 3, 'product_category', 'Book')
+# db.Product.update_record(db.Product.level_1_table_name, 4, 'product_category', 'Book')
 
-db.Product.update_record(db.Product.level_1_table_name, 3, 'product_category', 'Book')
-db.Product.update_record(db.Product.level_1_table_name, 4, 'product_category', 'Book')
+category = (db.Product.get_record_value(db.Product.level_1_table_name, 1,
+                                              'product_category'))
+
+category =str(category[0])
+
+print(category)

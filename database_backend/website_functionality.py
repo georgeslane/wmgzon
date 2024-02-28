@@ -20,15 +20,15 @@ class Product:
     """The purchase_increment_stock method decreases the quantity of stock in the database by one and increments the 
     quantity sold by one. It should be called each time a product is purchased."""
     def purchase_increment_stock(self, id):
-        quantity_in_stock = db_tables.Product.get_record_value(db_tables.Product.level_1_table_name, id, 'quantity_in_stock')
-        db_tables.Product.update_record(db_tables.Product.level_1_table_name, id, quantity_in_stock)
-        quantity_sold = db_tables.Product.get_record_value(db_tables.Product.level_1_table_name, id, 'quantity_sold')
-        db_tables.Product.update_record(db_tables.Product.level_1_table_name, id, quantity_sold)
+        quantity_in_stock = int(db_tables.Product.get_record_value(db_tables.Product.level_1_table_name, id, 'quantity_in_stock')[0])
+        db_tables.Product.update_record(db_tables.Product.level_1_table_name, id, 'quantity_in_stock', quantity_in_stock - 1)
+        quantity_sold = int(db_tables.Product.get_record_value(db_tables.Product.level_1_table_name, id, 'quantity_sold')[0])
+        db_tables.Product.update_record(db_tables.Product.level_1_table_name, id, 'quantity_sold', quantity_sold + 1)
 
     """The discount_price_method takes a discount value as an argument and uses it to calculate a new product price 
     before updating the product price in the database."""
     def discount_price(self, id, discount):
-        base_price = db_tables.Product.get_record_value(db_tables.Product.level_1_table_name, id, 'base_price')
+        base_price = int(db_tables.Product.get_record_value(db_tables.Product.level_1_table_name, id, 'base_price')[0])
         price = base_price * (1 - discount)
         db_tables.Product.update_record(db_tables.Product.level_1_table_name, id, 'price', price)
         db_tables.Product.update_record(db_tables.Product.level_1_table_name, id, 'product_discount', discount)
@@ -46,15 +46,17 @@ class Product:
 
     """The get_products_by_category method returns other products that are in the same category as the 
     product it is called on."""
-    def get_products_by_category(self, product_id):
+    def get_products_by_category(self, product_id, dictionary):
         category = db_tables.Product.get_record_value(db_tables.Product.level_1_table_name, product_id,
                                                       'product_category')
         product_ids = db_tables.Product.get_id_from_any_column(db_tables.Product.level_1_table_name,
                                                                'product_category', category)
+        category = str(category[0])
         products = []
         for id in product_ids:
             products.append(db_tables.Product.get_record(id))
-            return products
+        dictionary[category] = products
+        return dictionary
 
     """The add_product_to_list method adds the product it is called on to a specified product list."""
     def add_product_to_list(self, product_id, list_id):
@@ -236,6 +238,30 @@ class Search:
         search_results = db_tables.ProductBook.search_products(search_string, db_tables.ProductBook.level_2_table_name)
         dictionary['search_results'] = search_results
         return dictionary
+
+    def get_unique_values_from_search(self, dictionary, products):
+        product_categories = []
+        product_genres = []
+        product_media_types = []
+        product_languages = []
+        product_author = []
+        for product in products:
+            product_categories.append(product[4])
+            product_genres.append(product[10])
+            product_media_types.append(product[9])
+            product_languages.append(product[11])
+            product_author.append(product[8])
+        product_categories = list(set(product_categories))
+        product_genres = list(set(product_genres))
+        product_media_types = list(set(product_media_types))
+        product_languages = list(set(product_languages))
+        product_author = list(set(product_author))
+        dictionary['unique_categories'] = product_categories
+        dictionary['unique_genres'] = product_genres
+        dictionary['unique_media_types'] = product_media_types
+        dictionary['unique_languages'] = product_languages
+        dictionary['unique_authors'] = product_author
+
 
 
 
