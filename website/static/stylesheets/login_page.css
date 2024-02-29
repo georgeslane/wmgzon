@@ -1,0 +1,42 @@
+#login_page{
+    background: rgb(241, 160, 111, 20%);
+    opacity: 100%
+}
+
+
+#login_area{
+    width: 100%;
+    margin: auto;
+    height: 100%;
+    overflow-x: hidden;
+    overflow-y: hidden;
+    text-align: center;
+    align-content: center;
+    justify-content: center;
+    display: block
+}
+
+#login_title{
+    margin-top: 100px
+}
+
+input.authentication{
+    display: block;
+    margin: 20px;
+    width: 90%;
+}
+
+#login_form{
+    justify-items: center;
+    align-items: center;
+    margin: auto;
+    display: inline-block;
+}
+
+#register_link{
+    margin-top: 20px;
+    display: block;
+    text-align: center;
+    color: black;
+    text-decoration: none;
+}

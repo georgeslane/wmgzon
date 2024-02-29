@@ -1,5 +1,5 @@
 import datetime
-from website import database_table_names as db_tables
+from website import database_object_initialisation as db_tables
 
 
 class Product:

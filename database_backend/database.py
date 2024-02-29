@@ -330,9 +330,10 @@ class AccountDatabase(Database):
     """The compare_passwords method below takes a password and id as arguments and returns True only if the hashed and 
     salted password argument matches the stored hashed_password in the password table."""
     def compare_passwords(self, password, id):
-        stored_password = self.cursor.execute("SELECT hashed_passwords FROM " + self.password_table_name + "WHERE id = \
-        ?", self.SqlReader.convert_to_tuple(id))
-        salt = self.cursor.execute("SELECT salt FROM " + self.account_table_name + "WHERE id = ?", self.SqlReader.convert_to_tuple(id))
+        stored_password = self.cursor.execute("SELECT hashed_passwords FROM " + self.password_table_name + " WHERE id = ?", self.SqlReader.convert_to_tuple(id))
+        stored_password = bytes(stored_password.fetchone()[0])
+        salt = self.cursor.execute("SELECT salt FROM " + self.account_table_name + " WHERE id = ?", self.SqlReader.convert_to_tuple(id))
+        salt = bytes(salt.fetchone()[0])
         if stored_password == self.AccountSecurity.hash_password(password, salt):
             return True
         else:

@@ -1,4 +1,4 @@
-from website import database_table_names as db_tables
+from website import database_object_initialisation as db_tables
 
 db_tables.Product.delete_record(1)
 db_tables.Product.delete_record(2)

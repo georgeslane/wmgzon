@@ -23,9 +23,12 @@ div.header_bar {
 
 /*ID for the website logo*/
 #header_bar_logo {
-    object-fit:contain;
-    object-position: left
+    object-position: left;
+    height: 100%;
+    width: auto;
 }
+
+
 
 /*Id for the header search bar (used to search for products)*/
 #header_bar_search{

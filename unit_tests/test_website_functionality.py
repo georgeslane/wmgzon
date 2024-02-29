@@ -1,5 +1,5 @@
 import pytest
-from website import database_table_names as db
+from website import database_object_initialisation as db
 
 class TestProduct:
 

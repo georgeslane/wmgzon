@@ -1,4 +1,4 @@
-from website import database_table_names as db
+from website import database_object_initialisation as db
 
 # This file adds dummy data to the database for testing purposes.
 
