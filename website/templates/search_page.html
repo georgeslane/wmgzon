@@ -119,9 +119,10 @@
         for (let item of unique_list){
             let filter_option = document.createElement('div');
             let filter_checkbox = document.createElement('input');
-            filter_checkbox.setAttribute('type', 'radio');
+            filter_checkbox.setAttribute('type', 'checkbox');
             filter_checkbox.setAttribute('name', item);
             filter_checkbox.setAttribute('id', list_heading + item);
+            filter_checkbox.addEventListener('click', checkbox_listener.bind(search_items, list_heading, item));
             let filter_label = document.createElement('label');
             filter_label.setAttribute('for', list_heading + item);
             filter_label.innerHTML = item;
@@ -129,6 +130,48 @@
             filter_option.appendChild(filter_checkbox);
             filter_option.appendChild(filter_label);
         }
+    }
+
+    function checkbox_listener(search_items, filter_name, filter_value){
+        updated_search_items = [];
+        if(filter_name === "Genre") {
+            for (let item of search_items){
+                if (item[10] === filter_value) {
+                    updated_search_items.push(item);
+                }
+            }
+        }
+                else if(filter_name === "Category") {
+            for (let item of search_items) {
+                if (item[4] === filter_value) {
+                    updated_search_items.push(item);
+                }
+            }
+        }
+        else if(filter_name === "Authors") {
+            for (let item of search_items) {
+                if (item[8] === filter_value) {
+                    updated_search_items.push(item);
+                }
+            }
+        }
+        else if(filter_name === "Media types") {
+            for (let item of search_items) {
+                if (item[9] === filter_value) {
+                    updated_search_items.push(item);
+                }
+            }
+        }
+        else if(filter_name === "Languages") {
+            for (let item of search_items) {
+                if (item[11] === filter_value) {
+                    updated_search_items.push(item);
+                }
+            }
+        }
+        search_items = updated_search_items;
+        display_search_results(search_items);
+
     }
 
 
@@ -154,7 +197,7 @@
     display_filters(search_results.unique_authors, "Authors");
     display_filters(search_results.unique_media_types, "Media types");
     display_filters(search_results.unique_categories, "Categories");
-    display_filters(search_resuults.unique_languages, "Languages");
+    display_filters(search_results.unique_languages, "Languages");
 
 </script>
 </html>

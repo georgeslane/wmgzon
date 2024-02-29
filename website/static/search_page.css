@@ -10,7 +10,7 @@ div.header_bar {
     overflow: hidden;
     margin: auto;
     padding: 5px;
-    display: flex
+    display: flex;
 }
 
 /*Formats the elements in the website header*/
@@ -70,16 +70,18 @@ div.category_bar {
 #search_area{
     display: inline;
     width: 100%;
-    overflow-x: hidden;
+    overflow: hidden;
     justify-content: center;
     align-items: center;
+    max-height: calc(100% - 96px);
 }
 
 #search_filters{
-    width: 16.6666%;
+    width: 16.6667%;
     float: left;
-    border-right: solid black 1px;
-    height: 100%;
+    min-height: 100%;
+    background: #A1E0EE;
+    position: fixed;
 }
 
 #search_results{
