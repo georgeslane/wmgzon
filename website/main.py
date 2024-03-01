@@ -65,6 +65,7 @@ def login():
             login_user(user)
             session['permission_id'] = db.Account.get_record_value(db.Account.account_table_name, id[0], 'permission_id')[0]
             session['account_id'] = id[0]
+            session['username'] = username
             return redirect(session.get('next_url'))
       else:
         return 'Invalid username or password'
@@ -89,11 +90,48 @@ def register():
 @login_required
 def account():
     if session['permission_id'] == 'ADMIN':
+        admin_info = {}
+        admin_info['username'] = session['username']
         return render_template('account_page.html')
     else:
         customer_info = {}
         db.PaymentMethodFunctions.get_payment_methods_for_account(session['account_id'], customer_info)
+        db.DeliveryMethodFunctions.get_delivery_methods_for_account(session['account_id'], customer_info)
+        customer_info['username'] = session['username']
+        if request.method == 'POST':
+            if 'card_number' in request.form:
+                card_number = request.form['card_number']
+                expiry_date = request.form['expiry_date']
+                cvv = request.form['security_code']
+                card_name = request.form['cardholder_name']
+                bank = request.form['card_provider']
+                billing_address = request.form['billing_address']
+                db.PaymentMethod.add_payment_method(session['account_id'], card_number, cvv, card_name, expiry_date, billing_address, bank)
+            elif 'postcode' in request.form:
+                line_1 = request.form['address_line_1']
+                line_2 = request.form['address_line_2']
+                line_3 = request.form['address_line_3']
+                postcode = request.form['postcode']
+                city = request.form['city']
+                country = request.form['address_country']
+                db.DeliveryMethod.add_delivery_method(session['account_id'], line_1, line_2, line_3, city, country, postcode)
         return render_template('customer_account_page.html', customer_info=customer_info)
+
+@app.route('/delete_card/<int:card_id>', methods=['POST'])
+def delete_card(card_id):
+    if UserMixin.is_authenticated:
+        db.PaymentMethod.delete_record(card_id)
+        return redirect(url_for('account'))
+    else:
+        return redirect(url_for('login'))
+
+@app.route('/delete_address/<int:address_id>', methods=['POST'])
+def delete_address(address_id):
+    if UserMixin.is_authenticated:
+        db.DeliveryMethod.delete_record(address_id)
+        return redirect(url_for('account'))
+    else:
+        return redirect(url_for('login'))
 
 
 @app.route('/basket')

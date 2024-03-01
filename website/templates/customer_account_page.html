@@ -27,20 +27,62 @@
     <a class="category_bar_elements" style="background: rgba(241,224,86,0.5)" href="/jewellery_page.html">Jewellery</a>
     <a class="category_bar_elements" style="background: rgba(146,241,225,0.5)" href="/movies_page.html">Movies</a>
 </div>
-
-
+<h1 class="headings">Welcome to your account, {{customer_info['username']}}</h1>
+<hr class="page_divider">
+<h3 class="headings">Payment methods</h3>
 <div class="page_section">
-    <h3>Payment methods</h3>
     {% for payment_method in customer_info['payment_methods'] %}
     <div class="payment_method">
-        <h5>{{payment_method[4]}}</h5>
-        <h6>{{payment_method[2]}}</h6>
-        <h6>{{payment_method[3]}}</h6>
-        <h6>{{payment_method[5]}}</h6>
-        <h6>{{payment_method[6]}}</h6>
-        <h6>{{payment_method[7]}}</h6>
+        <h5>Cardholder name: {{payment_method[4]}}</h5>
+        <h6>Card number: {{payment_method[2]}}</h6>
+        <h6>Security code: {{payment_method[3]}}</h6>
+        <h6>Expiry date: {{payment_method[5]}}</h6>
+        <h6>Billing address: {{payment_method[6]}}</h6>
+        <h6>Card provider: {{payment_method[7]}}</h6>
+        <form action="{{url_for('delete_card', card_id=payment_method[0])}}" method="post">
+            <input type="submit" value="Delete card" name="delete_card">
+        </form>
     </div>
     {% endfor %}
+</div>
+<hr class="page_divider">
+<h3 class="headings">Add a payment method</h3>
+<div class="page_section">
+    <form class ='add_new_method' action="" method="post">
+        <input type="text" name="cardholder_name" placeholder="Cardholder name" value="{{request.form.cardholder_name}}" class="new_method_attributes" required>
+        <input type="text" name="card_number" placeholder="Card number" value="{{request.form.card_number}}" class="new_method_attributes" required>
+        <input type="text" name="security_code" placeholder="Security code" value="{{request.form.security_code}}" class="new_method_attributes" required>
+        <input type="date" name="expiry_date" placeholder="Expiry date" value="{{request.form.expiry_date}}" class="new_method_attributes" required>
+        <input type="text" name="billing_address" placeholder="Billing address" value="{{request.form.bill_address}}" class="new_method_attributes" required>
+        <input type="text" name="card_provider" placeholder="Card provider" value="{{request.form.card_provider}}" class="new_method_attributes" required>
+        <input type="submit" value="Add card" class="new_method_attributes" name="add_card">
+    </form>
+</div>
+<hr class="page_divider">
+<h3 class="headings">Delivery addresses</h3>
+<div class="page_section">
+    {% for delivery_method in customer_info['delivery_methods'] %}
+    <div class="payment_method">
+        <h5>Address: {{delivery_method[2]}}, {{delivery_method[3]}}, {{delivery_method[4]}}, {{delivery_method[5]}}, {{delivery_method[6]}}</h5>
+        <h6>Postcode: {{delivery_method[7]}}</h6>
+        <form action="{{url_for('delete_address', address_id=delivery_method[0])}}" method="post">
+            <input type="submit" value="Delete address" name="delete_address">
+        </form>
+    </div>
+    {% endfor %}
+</div>
+<hr class="page_divider">
+<h3 class="headings">Add a delivery address</h3>
+<div class="page_section">
+    <form class ='add_new_method' action="" method="post">
+        <input type="text" name="address_line_1" placeholder="Address line one" value="{{request.form.address_line_1}}" class="new_method_attributes" required>
+        <input type="text" name="address_line_2" placeholder="Address line two" value="{{request.form.address_line_2}}" class="new_method_attributes" required>
+        <input type="text" name="address_line_3" placeholder="Address line three" value="{{request.form.address_line_3}}" class="new_method_attributes" required>
+        <input type="text" name="city" placeholder="City" value="{{request.form.city}}" class="new_method_attributes" required>
+        <input type="text" name="address_country" placeholder="Country" value="{{request.form.address_country}}" class="new_method_attributes" required>
+        <input type="text" name="postcode" placeholder="Postcode" value="{{request.form.postcode}}" class="new_method_attributes" required>
+        <input type="submit" value="Add address" class="new_method_attributes" name="add_address">
+    </form>
 </div>
 
 <script>

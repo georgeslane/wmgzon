@@ -36,7 +36,7 @@ class Product:
     """The get_reviews_for_product method returns all reviews for a given product in the form of a for loop that 
     returns each review as a list."""
     def get_reviews_for_product(self, product_id, dictionary):
-        review_ids = db_tables.Review.get_id_from_any_column(db_tables.Review.table_name, 'product_id', (product_id,))
+        review_ids = db_tables.Review.get_id_from_any_column(db_tables.Review.table_name, 'product_id', product_id)
         reviews = []
         for review_id in review_ids:
             reviews.append(db_tables.Review.get_record(review_id))
@@ -220,6 +220,14 @@ class DeliveryMethod:
     delivery_method_address_line_3, delivery_method_address_city, delivery_method_address_country,
     delivery_method_address_postcode, account_id.
     And methods: edit_delivery_method, delete_delivery_method"""
+
+    def get_delivery_methods_for_account(self, account_id, dictionary):
+        delivery_ids = db_tables.DeliveryMethod.get_id_from_any_column(db_tables.DeliveryMethod.delivery_table_name, 'account_id', account_id)
+        delivery_methods = []
+        for id in delivery_ids:
+            delivery_methods.append(db_tables.DeliveryMethod.get_record(id))
+        dictionary['delivery_methods'] = delivery_methods
+        return dictionary
 
 class Search:
 

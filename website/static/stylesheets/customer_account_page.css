@@ -8,8 +8,11 @@ div.page_section{
     overflow-x: scroll;
     overflow-y: hidden;
     white-space: nowrap;
-    margin: 50px;
+    padding: 50px;
     text-align: center;
+    width: 90%;
+    margin-right: 5%;
+    margin-left: 5%;
 }
 
 div.payment_method{
@@ -19,4 +22,26 @@ div.payment_method{
     border: 1px solid #000000;
     border-radius: 10px;
     background-color: #f0f0f0;
+    width: 100%
+}
+
+hr.page_divider{
+    width: 90%;
+    margin-left: 5%;
+    margin-right: 5%;
+}
+
+.headings{
+    margin-left: 5%;
+    margin-top: 3%;
+}
+
+form.add_new_method{
+    display: block;
+}
+
+input.new_method_attributes{
+    display: block;
+    margin-bottom: 5px;
+    background: #f0f0f0
 }
