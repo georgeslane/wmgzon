@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="../static/stylesheets/admin_account_page.css"/>
+    <link rel="stylesheet" type="text/css" href="../static/stylesheets/website_header.css"/>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>Account</title>
+</head>
+<body id="page_format">
+<!-- The header bar below contains the logo, search bar, and account and basket links and should be used globally across the site -->
+<div class ='header_bar'>
+    <a href="/" class ='header_bar_elements'><img id="header_bar_logo" src="../static/images/wmgzon_logo.png" alt="WMGzon logo"/> </a>
+    <form action="{{url_for('search')}}" method="post" class="header_bar_elements"><input id="header_bar_search" type="text" placeholder="Search products" name="search_string"/></form>
+    <div class ="header_bar_elements" style="padding-left: calc(33.3% - 155px)">
+        <a href="/account"><img id="header_bar_account" src="../static/images/account.png" alt="Account" href="../../website/web_pages/account_page.html"/> </a>
+        <a href="/basket"><img id="header_bar_basket" src="../static/images/basket.png" alt="Basket" href="../../website/web_pages/basket_page.html"/> </a>
+    </div>
+</div>
+
+<!-- The sub-header below contains links to product category pages and should be used globally across the site. -->
+<div class="category_bar">
+    <a class="category_bar_elements" style="background: rgba(183,241,167,0.5)" href="/groceries_page.html">Groceries</a>
+    <a class="category_bar_elements" style="background: rgba(192,188,188,0.5)" href="/electronics_page.html">Electronics</a>
+    <a class="category_bar_elements" style="background: rgba(210,184,245,0.5)" href="/songs_page.html">Songs</a>
+    <a class="category_bar_elements" style="background: rgba(241,160,111,0.5)" href="/books_page.html">Books</a>
+    <a class="category_bar_elements" style="background: rgba(241,224,86,0.5)" href="/jewellery_page.html">Jewellery</a>
+    <a class="category_bar_elements" style="background: rgba(146,241,225,0.5)" href="/movies_page.html">Movies</a>
+</div>
+<h1 class="headings">Welcome to the product management centre, {{admin_info['username']}}</h1>
+<hr class="page_divider">
+<h3 class="headings">Product Management system</h3>
+<form class="headings" action="" method="post">
+    <input type="search" name="search_string" placeholder="Search products" value="{{request.form.search_string}}" >
+</form>
+<table class="product_table">
+    <tr>
+        <th class="table_headers">Product ID</th>
+        <th class="table_headers">Product name</th>
+        <th class="table_headers">Net Price</th>
+        <th class="table_headers">Discount</th>
+        <th class="table_headers">Date added</th>
+        <th class="table_headers">Quantity in stock</th>
+        <th class="table_headers">Category</th>
+        <th class="table_headers">Update Stock</th>
+        <th class="table_headers">Discount Product</th>
+        <th class="table_headers">Delete</th>
+    </tr>
+    {% for product in admin_info['search_results']%}
+    <tr>
+        <td class="table_data">{{product[0]}}</td>
+        <td class="table_data">{{product[1]}}</td>
+        <td class="table_data">{{product[6]}}</td>
+        <td class="table_data">{{product[16]}}</td>
+        <td class="table_data">{{product[5]}}</td>
+        <td class="table_data">{{product[15]}}</td>
+        <td class="table_data">{{product[4]}}</td>
+        <form action="" method="post">
+            <input type="hidden" name="product_id" value="{{product[0]}}">
+            <td class="table_data"><input type="text" name="stock" placeholder="Update stock" value="{{request.form.stock}}"></td>
+            <input type="submit" name="update_stock" value="Update stock" hidden>
+        </form>
+        <form action="" method="post">
+            <input type="hidden" name="product_id" value="{{product[0]}}">
+            <td class="table_data"><input type="text" name="discount" placeholder="Apply discount" value="{{request.form.discount}}"></td>
+            <input type="submit" name="update_stock" value="Update stock" hidden>
+        </form>
+        <form action="{{url_for('delete_product', product_id = product[0])}}" method="post"><td class="table_data"><input type="submit" name="delete_product" placeholder="Delete product" value="{{request.form.delete}}"></td></form>
+    </tr>
+    {% endfor %}
+</table>
+<hr class="page_divider">
+<h3 class="headings">Products by sales</h3>
+<div>
+    <canvas class ="charts" id="products_by_sales">
+    </canvas>
+    <hr class="page_divider">
+    <h3 class="headings">Products by price</h3>
+    <canvas class="charts" id="products_by_price">
+    </canvas>
+</div>
+<hr class="page_divider">
+<h3 class="headings">Add a new product</h3>
+<form class="headings" action="" method="post">
+    <input type="text" name="product_name" placeholder="Product name" value="{{request.form.product_name}}" required>
+    <input type="text" name="product_price" placeholder="Product base price" value="{{request.form.product_price}}" required>
+    <input type="text" name="product_stock" placeholder="Stock" value="{{request.form.product_stock}}" required>
+    <input type="text" name="product_category" placeholder="Category" value="{{request.form.product_category}}" required>
+    <input type="text" name="product_description" placeholder="Description" value="{{request.form.product_description}}" required>
+    <input type="text" name="product_image" placeholder="Image" value="{{request.form.product_image}}" required>
+    <input type="text" name="product_genre" placeholder="Genre" value="{{request.form.product_genre}}">
+    <input type="text" name="product_author" placeholder="Author" value="{{request.form.product_author}}">
+    <input type="text" name="product_publisher" placeholder="Publisher" value="{{request.form.product_publisher}}">
+    <input type="text" name="product_media_type" placeholder="Media type" value="{{request.form.product_author}}">
+    <input type="text" name="product_edition" placeholder="Edition" value="{{request.form.product_edition}}">
+    <input type="text" name="product_illustrations" placeholder="Illustrations" value="{{request.form.product_illustrations}}">
+    <input type="text" name="product_synopsis" placeholder="Synopsis" value="{{request.form.product_synopsis}}">
+    <input type="text" name="product_language" placeholder="Language" value="{{request.form.product_language}}">
+    <input type="text" name="product_isbn" placeholder="ISBN" value="{{request.form.product_isbn}}">
+    <input type="text" name="product_series_id" placeholder="Series ID" value="{{request.form.product_series_id}}">
+    <input type="text" name="product_position_in_series" placeholder="Position in series" value="{{request.form.product_position_in_series}}">
+    <input type="text" name="product_date_published" placeholder="Date published" value="{{request.form.product_date_published}}">
+    <input type="submit" name="add_product" value="Add product">
+</form>
+<hr class="page_divider">
+<a href="{{url_for('logout')}}"><h5 class="headings">Logout</h5></a>
+
+
+
+<script>
+    let admin_info = JSON.parse('{{admin_info|tojson|safe}}');
+
+    let product_names = []
+    let product_quantities = []
+    product_prices = []
+    for (let product of admin_info.search_results){
+        product_names.push(product[1])
+        product_quantities.push(product[17])
+        product_prices.push(product[6])
+    }
+
+    let sales_ctx = document.getElementById('products_by_sales').getContext('2d');
+
+    new Chart(sales_ctx, {
+        type: "bar",
+        data: { labels: product_names, datasets: [{ label: "Most sold products", data: product_quantities, backgroundColor: ["#3e95cd", "#8e5ea2","#3cba9f","#e8c3b9","#c45850"] }]},
+        options: {}
+    });
+
+    let price_ctx = document.getElementById('products_by_price').getContext('2d');
+
+    new Chart(price_ctx, {
+        type: "bar",
+        data: { labels: product_names, datasets: [{ label: "Most sold products", data: product_prices, backgroundColor: ["#3e95cd", "#8e5ea2","#3cba9f","#e8c3b9","#c45850"] }]},
+        options: {}
+    });
+</script>
+</body>
+</html>

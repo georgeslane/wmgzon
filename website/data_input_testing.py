@@ -6,7 +6,7 @@ from website import database_object_initialisation as db
 # print(a)
 # print(list(a))
 #
-# db.ProductDigitalBook.add_digital_book('LOTR', 12, 'A tale of middle earth', 'Book',
+# db.ProductDigitalBook.add_digital_book('Harry Potter', 12, 'A tale of middle earth', 'Book',
 #                                        100, 'https://m.media-amazon.com/images/I/81zqkBcTTCL._AC_UF1000,1000_QL80_.jpg'
 #                                        , '2023-07-10', 8, 1000, 0.33, 'JRR Tolkien', 'Ebook',
 #                                        'A brave tale of hobbits wandering through a desolate wilderness in a brave attempt to destroy a ring of power',
@@ -16,10 +16,13 @@ from website import database_object_initialisation as db
 # db.Product.update_record(db.Product.level_1_table_name, 4, 'product_category', 'Book')
 
 # db.Account.add_account('donald_duck', '15grs@swgs.wilts.sch.uk', 'ADMIN', 'qwerty')
-
+db.Account.add_account('kneecy', 'neece@coolmail.com', 'CUST', 'cute')
 # if db.Account.compare_passwords('qwerty', db.Account.get_id_from_username('donald_duck')[0]) == True:
 #     print('True')
 # else:
 #     print('False')
 
-db.PaymentMethod.add_payment_method('2', 1233321234566789, 234, 'George', '2023-07-10', '78 moon rd', 'Chase')
+# db.PaymentMethod.add_payment_method('2', 1233321234566789, 234, 'George', '2023-07-10', '78 moon rd', 'Chase')
+
+
+db.ProductBook.update_record(db.ProductBook.level_2_table_name, 6, 'media_type', 'praperback')

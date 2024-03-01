@@ -106,8 +106,17 @@ class ProductDatabase(Database):
     def search_products(self, search_term, table_2):
         self.cursor.execute("SELECT t1.id, t1.product_name, t1.product_image_url, t1.product_description, t1.product_category, \
         t1.date_added, t1.price, t2.id, t2.author, t2.media_type, t2.genre, t2.language, t2.publisher, \
-        t2.illustrations, t2.date, t1.quantity_in_stock, t1.product_discount FROM " + self.level_1_table_name + " AS t1 LEFT JOIN " + table_2 + " AS t2 ON t1.id = t2.id WHERE t1.product_name LIKE '%" + search_term + "%' OR \
+        t2.illustrations, t2.date, t1.quantity_in_stock, t1.product_discount, t1.quantity_sold FROM " + self.level_1_table_name + " AS t1 LEFT JOIN " + table_2 + " AS t2 ON t1.id = t2.id WHERE t1.product_name LIKE '%" + search_term + "%' OR \
         t1.product_category LIKE '%" + search_term + "%'")
+        results = self.cursor.fetchall()
+        results = self.SqlReader.convert_from_large_tuples_in_large_lists(results)
+        return results
+
+
+    def get_all_products(self, table_2):
+        self.cursor.execute("SELECT t1.id, t1.product_name, t1.product_image_url, t1.product_description, t1.product_category, \
+        t1.date_added, t1.price, t2.id, t2.author, t2.media_type, t2.genre, t2.language, t2.publisher, \
+        t2.illustrations, t2.date, t1.quantity_in_stock, t1.product_discount, t1.quantity_sold FROM " + self.level_1_table_name + " AS t1 LEFT JOIN " + table_2 + " AS t2 ON t1.id = t2.id")
         results = self.cursor.fetchall()
         results = self.SqlReader.convert_from_large_tuples_in_large_lists(results)
         return results

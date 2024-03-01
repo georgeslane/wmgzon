@@ -1,0 +1,41 @@
+#page_format{
+    background: rgb(241, 160, 111, 20%);
+    opacity: 100%;
+}
+
+table.product_table{
+    width: 90%;
+    margin-left: 5%;
+    margin-right: 5%;
+    border: solid black 1px;
+    border-collapse: collapse;
+}
+
+th.table_headers{
+    border: solid black 1px;
+    border-collapse: collapse;
+}
+
+td.table_data{
+    border: solid black 1px;
+    border-collapse: collapse;
+}
+
+.headings{
+    margin-left: 5%;
+    margin-top: 3%;
+    margin-bottom: 3%;
+}
+
+.page_divider{
+    width: 90%;
+    margin-left: 5%;
+    margin-right: 5%;
+}
+
+canvas.charts{
+    width: 40%;
+    margin-left: 5%;
+    margin-right: 5%;
+    display: inline-block;
+}

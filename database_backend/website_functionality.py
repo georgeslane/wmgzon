@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 from website import database_object_initialisation as db_tables
 
 
@@ -83,27 +83,26 @@ class Product:
         dictionary['product_data'] = product
         return dictionary
 
+    def restock_product(self, id, quantity):
+        db_tables.Product.update_record(db_tables.Product.level_1_table_name, id, 'quantity_in_stock', quantity)
+
 
 class ProductBook(Product):
     """Inherits from Product. Contains attributes: media_type, author, synopsis, genre, language, publisher, edition,
     ISBN, illustrations, series_id, position_in_series.
     And methods: view_similar_genre, view_similar_author"""
-    def add_new_book(self, account_id, product_name, base_price, product_description, product_category,
-                     quantity_in_stock, product_image_url, date_added, price, quantity_sold, product_discount, author,
+    def add_new_book(self, product_name, base_price, product_description, product_category,
+                     quantity_in_stock, product_image_url, author,
                      media_type, synopsis, genre, language, publisher, edition, isbn, illustrations, series_id,
                      position_in_series, date_published):
-        permissions = db_tables.Account.get_record_value(db_tables.Account.account_table_name, account_id,
-                                                         'permission_id')
-        if permissions == ['ADMIN']:
-            db_tables.ProductBook.add_book(product_name, base_price, product_description, product_category,
-                                           quantity_in_stock, product_image_url, date_added, price, quantity_sold,
-                                           product_discount, author, media_type, synopsis, genre, language, publisher, edition,
+
+        db_tables.ProductBook.add_book(product_name, base_price, product_description, product_category,
+                                           quantity_in_stock, product_image_url, datetime.now(), base_price, 0,
+                                           0, author, media_type, synopsis, genre, language, publisher, edition,
                                            isbn, illustrations, series_id, position_in_series, date_published)
-        else:
-            return 'You do not have the correct permissions to add a product.'
 
     def view_similar_genre(self, id, dictionary):
-        genre = db_tables.ProductBook.get_record_value(db_tables.ProductBook.level_2_table_name, id, 'genre')
+        genre = db_tables.ProductBook.get_record_value(db_tables.ProductBook.level_2_table_name, id, 'genre')[0]
         if genre != 0:
             product_ids = db_tables.ProductBook.get_id_from_any_column(db_tables.ProductBook.level_2_table_name, 'genre',
                                                                    genre)
@@ -119,7 +118,7 @@ class ProductBook(Product):
 
 
     def view_similar_author(self, id, dictionary):
-        author = db_tables.ProductBook.get_record_value(db_tables.ProductBook.level_2_table_name, id, 'author')
+        author = db_tables.ProductBook.get_record_value(db_tables.ProductBook.level_2_table_name, id, 'author')[0]
         if author != 0:
             product_ids = db_tables.ProductBook.get_id_from_any_column(db_tables.ProductBook.level_2_table_name, 'author',
                                                                    author)

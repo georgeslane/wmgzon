@@ -22,6 +22,7 @@ def load_user(user_id):
     user.id = user_id
     return user
 
+
 @app.route('/')
 def home():
     return render_template('home_page.html')
@@ -71,6 +72,11 @@ def login():
         return 'Invalid username or password'
    return render_template('login_page.html')
 
+@app.route('/logout')
+def logout():
+    logout_user()
+    return redirect(url_for('home'))
+
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -92,7 +98,43 @@ def account():
     if session['permission_id'] == 'ADMIN':
         admin_info = {}
         admin_info['username'] = session['username']
-        return render_template('account_page.html')
+        admin_info['search_results'] = db.Product.get_all_products(db.ProductBook.level_2_table_name)
+        if request.method == 'POST':
+            if 'search_string' in request.form:
+                search_string = request.form['search_string']
+                db.SearchFunctions.search_products(search_string, admin_info)
+            elif 'discount' in request.form:
+                discount = request.form['discount']
+                product_id = request.form['product_id']
+                db.ProductFunctions.discount_price(product_id, float(discount))
+            elif 'stock' in request.form:
+                stock = request.form['stock']
+                product_id = request.form['product_id']
+                db.ProductFunctions.restock_product(product_id, stock)
+            elif 'add_product' in request.form:
+                name = request.form['product_name']
+                price = request.form['product_price']
+                description = request.form['product_description']
+                category = request.form['product_category']
+                stock = request.form['product_stock']
+                image = request.form['product_image']
+                genre = request.form['product_genre']
+                author = request.form['product_author']
+                publisher = request.form['product_publisher']
+                edition = request.form['product_edition']
+                isbn = request.form['product_isbn']
+                media_type = request.form['product_media_type']
+                illustrations = request.form['product_illustrations']
+                synopsis = request.form['product_synopsis']
+                language = request.form['product_language']
+                series_id = request.form['product_series_id']
+                position_in_series = request.form['product_position_in_series']
+                date_published = request.form['product_date_published']
+                db.ProductBookFunctions.add_new_book(name, price, description, category, stock, image, author,
+                                                     media_type, synopsis, genre, language, publisher, edition, isbn,
+                                                     illustrations, series_id, position_in_series, date_published)
+            return redirect(url_for('account'))
+        return render_template('admin_account_page.html', admin_info=admin_info)
     else:
         customer_info = {}
         db.PaymentMethodFunctions.get_payment_methods_for_account(session['account_id'], customer_info)
@@ -116,6 +158,30 @@ def account():
                 country = request.form['address_country']
                 db.DeliveryMethod.add_delivery_method(session['account_id'], line_1, line_2, line_3, city, country, postcode)
         return render_template('customer_account_page.html', customer_info=customer_info)
+
+@app.route('/delete_product/<int:product_id>', methods=['POST'])
+def delete_product(product_id):
+    if UserMixin.is_authenticated:
+        db.Product.delete_record(product_id)
+        try:
+            db.ProductBook.delete_record(product_id)
+        except:
+            pass
+        try:
+            db.ProductDigitalBook.delete_record(product_id)
+        except:
+            pass
+        try:
+            db.ProductPhysicalBook.delete_record(product_id)
+        except:
+            pass
+        return redirect(url_for('account'))
+    else:
+        return redirect(url_for('login'))
+
+
+
+
 
 @app.route('/delete_card/<int:card_id>', methods=['POST'])
 def delete_card(card_id):
