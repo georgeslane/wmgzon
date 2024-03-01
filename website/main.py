@@ -10,6 +10,12 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
 
+@login_manager.unauthorized_handler
+def unauthorized_callback():
+    if 'login' not in request.path:
+        session['next_url'] = request.path
+    return redirect(url_for('login'))
+
 @login_manager.user_loader
 def load_user(user_id):
     user = UserMixin()
@@ -29,6 +35,7 @@ def product(id):
    db.ProductFunctions.get_reviews_for_product(id, product_dictionary)
    db.ProductBookFunctions.view_similar_author(id, product_dictionary)
    db.ProductBookFunctions.view_similar_genre(id, product_dictionary)
+   session['product_id'] = id
 
    return render_template('product_page.html', product=product_dictionary)
 
@@ -52,11 +59,13 @@ def login():
       password = request.form['password']
       id = db.Account.get_id_from_username(username)
       if id != 0:
-        if db.Account.compare_passwords(str(password), int(db.Account.get_id_from_username(username)[0])) == True:
+        if db.Account.compare_passwords(str(password), int(id[0])) == True:
             user = UserMixin()
             user.id = username
             login_user(user)
-            return redirect(url_for('product', id=1))
+            session['permission_id'] = db.Account.get_record_value(db.Account.account_table_name, id[0], 'permission_id')[0]
+            session['account_id'] = id[0]
+            return redirect(session.get('next_url'))
       else:
         return 'Invalid username or password'
    return render_template('login_page.html')
@@ -79,13 +88,34 @@ def register():
 @app.route('/account', methods=['GET', 'POST'])
 @login_required
 def account():
+    if session['permission_id'] == 'ADMIN':
         return render_template('account_page.html')
+    else:
+        customer_info = {}
+        db.PaymentMethodFunctions.get_payment_methods_for_account(session['account_id'], customer_info)
+        return render_template('customer_account_page.html', customer_info=customer_info)
 
 
 @app.route('/basket')
 @login_required
 def basket():
    return render_template('basket_page.html')
+
+
+@app.route('/review', methods=['POST', 'GET'])
+@login_required
+def review():
+    if request.method == 'POST':
+        review_heading = request.form['review_heading']
+        review_text = request.form['review_text']
+        rating = request.form['rating']
+        product_id = session['product_id']
+        account_id = session['account_id']
+        db.ReviewFunctions.add_review(product_id, account_id, review_heading, review_text, rating)
+        return redirect(url_for('product', id=product_id))
+    return render_template('review_page.html')
+
+
 
 
 if __name__ == '__main__':

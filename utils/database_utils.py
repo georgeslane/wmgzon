@@ -5,7 +5,7 @@ class SqliteReader():
 
     """The method below converts any single value input into a tuple of size 1"""
     def convert_to_tuple(self, input):
-        return (input,)
+            return (input,)
 
     """The method below converts any tuple of size n stored inside a list of size 1 into a list of size n, with each 
     element of the list coresponding to an element of the tuple."""

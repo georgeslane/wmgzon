@@ -1,0 +1,26 @@
+#background{
+    background: rgb(241, 160, 111, 20%);
+    opacity: 100%
+}
+
+#content{
+    display: block;
+    margin: auto;
+    text-align: center;
+    align-content: center;
+    justify-content: center;
+    padding: 100px;
+}
+
+#form{
+    justify-items: center;
+    align-items: center;
+    margin: auto;
+    display: inline-block;
+}
+
+input.form_input{
+    display: block;
+    margin: auto;
+    margin-top: 30px;
+}

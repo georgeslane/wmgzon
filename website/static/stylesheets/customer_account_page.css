@@ -1,0 +1,22 @@
+#page_format{
+    background: rgb(241, 160, 111, 20%);
+    opacity: 100%;
+}
+
+div.page_section{
+    display: inline-block;
+    overflow-x: scroll;
+    overflow-y: hidden;
+    white-space: nowrap;
+    margin: 50px;
+    text-align: center;
+}
+
+div.payment_method{
+    display: inline-block;
+    height: 100%;
+    padding: 10px;
+    border: 1px solid #000000;
+    border-radius: 10px;
+    background-color: #f0f0f0;
+}

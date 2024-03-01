@@ -43,7 +43,7 @@
             <img src="../static/images/yellow_star.png" alt="Rating" class="rating_stars" id="rating_star_3"/>
             <img src="../static/images/yellow_star.png" alt="Rating" class="rating_stars" id="rating_star_4"/>
             <img src="../static/images/grey_star.png" alt="Rating" class="rating_stars" id="rating_star_5"/>
-            <a href="../../website/web_pages_leave_review.html" style="margin-left: 3%">Leave a review</a>
+            <a href="/review" style="margin-left: 3%">Leave a review</a>
         </div>
         <br>
         <span style="font-size: large">Price: £{{ product['product_data'][8]}}</span>
@@ -217,10 +217,10 @@
             for (let i = 0; i < 5; i++){
                 let star = review_rating.cloneNode();
                 if (i < review[5]){
-                    star.setAttribute("src", "../static/yellow_star.png");
+                    star.setAttribute("src", "../static/images/yellow_star.png");
                 }
                 else{
-                    star.setAttribute("src", "../static/grey_star.png");
+                    star.setAttribute("src", "../static/images/grey_star.png");
                 }
                 review_box.appendChild(star);
             }

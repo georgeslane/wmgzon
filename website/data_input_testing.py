@@ -22,4 +22,4 @@ from website import database_object_initialisation as db
 # else:
 #     print('False')
 
-print(db.Account.get_id_from_username('d'))
+db.PaymentMethod.add_payment_method('2', 1233321234566789, 234, 'George', '2023-07-10', '78 moon rd', 'Chase')

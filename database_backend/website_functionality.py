@@ -207,6 +207,13 @@ class PaymentMethod:
     """Contains attributes: payment_method_id, payment_method_card_number, payment_method_card_security_code,
     payment_method_card_holder_name, payment_method_card_holder_expiry_date, payment_method_card_provider, account_id.
     And methods: edit_payment_method, delete_payment_method"""
+    def get_payment_methods_for_account(self, account_id, dictionary):
+        payment_ids = db_tables.PaymentMethod.get_id_from_any_column(db_tables.PaymentMethod.payment_table_name, 'account_id', account_id)
+        payment_methods = []
+        for id in payment_ids:
+            payment_methods.append(db_tables.PaymentMethod.get_record(id))
+        dictionary['payment_methods'] = payment_methods
+        return dictionary
 
 class DeliveryMethod:
     """Contains attributes: delivery_method_id, delivery_method_address_line_1, delivery_method_address_line_2,
