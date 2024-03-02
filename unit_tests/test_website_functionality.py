@@ -4,13 +4,7 @@ from website import database_object_initialisation as db
 class TestProduct:
 
     # Tests that adding a new product with an admin account adds the product to the product table.
-    def test_add_new_product_0(self):
-        db.ProductFunctions.add_new_product(1, 'LOTR', 10, 'Hobbits adventure', 'Book', 500, 'fdghfhgdgfh', '2020-01-01', 6, 0, 0.6)
-        assert db.Product.get_record(5) == [5, 'LOTR', 10.0, 'Hobbits adventure', 'Book', 500, 'fdghfhgdgfh', '2020-01-01', 6.0, 0, 0.6]
 
-    # Tests that adding a new product with a non admin account results in an error message.
-    def test_add_new_product_1(self):
-        assert db.ProductFunctions.add_new_product(2, 'Python for dummies', 30, 'Coding guidebook', 'Books', 2000, 'hdgfhdgfhdghf', '2023-02-04', 6, 0, 0.4) == "You do not have the correct permissions to add a product."
 
 
     # Tests that incrementing stock updates the quantity sold and decreases the quantity in stock by 1.

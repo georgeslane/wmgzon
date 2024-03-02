@@ -21,15 +21,18 @@ class Database:
     from the table denoted by 'self.table_name'."""
     def get_record(self, id):
         try:
-            self.cursor.execute("SELECT * FROM " + self.table_name + " WHERE id = ?", (self.SqlReader.convert_to_tuple(id)))
+            self.cursor.execute("SELECT * FROM " + self.table_name + " WHERE id = ?",
+                                (self.SqlReader.convert_to_tuple(id)))
             result = self.cursor.fetchall()
             return self.SqlReader.convert_from_tuple(result)
         except IndexError:
             'The inputted ID does not exist in the table'
 
-    """The method below gets all ids from a table, where a particular column matches a particular value. """
+    """'get_id_from_any_column' takes a column name, value and table name as arguments and returns a list of all ids 
+    that match the value in the specified column in the table. """
     def get_id_from_any_column(self, table_name, column_name, value):
-        self.cursor.execute("SELECT id FROM " + table_name + " WHERE " + column_name + " = ?", self.SqlReader.convert_to_tuple(value))
+        self.cursor.execute("SELECT id FROM " + table_name + " WHERE " + column_name + " = ?",
+                            self.SqlReader.convert_to_tuple(value))
         results = self.cursor.fetchall()
         results = self.SqlReader.convert_from_plural_tuples(results)
         return results
@@ -40,7 +43,7 @@ class Database:
         self.cursor.execute("DELETE FROM " + self.table_name + " WHERE id = ?", self.SqlReader.convert_to_tuple(id))
         self.connection.commit()
 
-    """The update_record method below updates a specific value in the selected table. 
+    """The update_record method below updates a specific value in the selected table to 'new_value'. 
     The value is determined by the 'column_name' and 'id' parameters."""
     def update_record(self, table_name, id, column_name, new_value):
         if column_name == 'id':
@@ -50,9 +53,10 @@ class Database:
                                 (new_value, id))
             self.connection.commit()
 
-    """The method below gets a specific value from a record in a table."""
+    """The method below gets a specific value from a record in a table and returns it as a list."""
     def get_record_value(self, table_name, id, column_name):
-        self.cursor.execute("SELECT " + column_name + " FROM " + table_name + " WHERE id = ?", self.SqlReader.convert_to_tuple(id))
+        self.cursor.execute("SELECT " + column_name + " FROM " + table_name + " WHERE id = ?",
+                            self.SqlReader.convert_to_tuple(id))
         result = self.cursor.fetchall()
         return self.SqlReader.convert_from_tuple(result)
 
@@ -102,21 +106,24 @@ class ProductDatabase(Database):
         self.connection.commit()
 
     """The search_products method below takes a search term as an argument and returns records that have a matching 
-    name or category from the product table."""
+    name or category from the product table. Records are returned as a nested list."""
     def search_products(self, search_term, table_2):
-        self.cursor.execute("SELECT t1.id, t1.product_name, t1.product_image_url, t1.product_description, t1.product_category, \
-        t1.date_added, t1.price, t2.id, t2.author, t2.media_type, t2.genre, t2.language, t2.publisher, \
-        t2.illustrations, t2.date, t1.quantity_in_stock, t1.product_discount, t1.quantity_sold FROM " + self.level_1_table_name + " AS t1 LEFT JOIN " + table_2 + " AS t2 ON t1.id = t2.id WHERE t1.product_name LIKE '%" + search_term + "%' OR \
-        t1.product_category LIKE '%" + search_term + "%'")
+        self.cursor.execute("SELECT t1.id, t1.product_name, t1.product_image_url, t1.product_description, \
+        t1.product_category, t1.date_added, t1.price, t2.id, t2.author, t2.media_type, t2.genre, t2.language, \
+        t2.publisher, t2.illustrations, t2.date, t1.quantity_in_stock, t1.product_discount, t1.quantity_sold \
+        FROM " + self.level_1_table_name + " AS t1 LEFT JOIN " + table_2 + " AS t2 ON t1.id = t2.id WHERE \
+        t1.product_name LIKE '%" + search_term + "%' OR t1.product_category LIKE '%" + search_term + "%'")
         results = self.cursor.fetchall()
         results = self.SqlReader.convert_from_large_tuples_in_large_lists(results)
         return results
 
-
+    """'get_all_products' returns all records from the product table, left joined to records from the product book 
+    table. It outputs a nested list, with the inner list containing selected product attributes."""
     def get_all_products(self, table_2):
-        self.cursor.execute("SELECT t1.id, t1.product_name, t1.product_image_url, t1.product_description, t1.product_category, \
-        t1.date_added, t1.price, t2.id, t2.author, t2.media_type, t2.genre, t2.language, t2.publisher, \
-        t2.illustrations, t2.date, t1.quantity_in_stock, t1.product_discount, t1.quantity_sold FROM " + self.level_1_table_name + " AS t1 LEFT JOIN " + table_2 + " AS t2 ON t1.id = t2.id")
+        self.cursor.execute("SELECT t1.id, t1.product_name, t1.product_image_url, t1.product_description, \
+        t1.product_category, t1.date_added, t1.price, t2.id, t2.author, t2.media_type, t2.genre, t2.language, \
+        t2.publisher, t2.illustrations, t2.date, t1.quantity_in_stock, t1.product_discount, t1.quantity_sold \
+        FROM " + self.level_1_table_name + " AS t1 LEFT JOIN " + table_2 + " AS t2 ON t1.id = t2.id")
         results = self.cursor.fetchall()
         results = self.SqlReader.convert_from_large_tuples_in_large_lists(results)
         return results
@@ -133,19 +140,21 @@ class ProductBookDatabase(ProductDatabase):
         self.level_1_table_name = level_1_table_name
         self.level_2_table_name = level_2_table_name
         self.cursor.execute("CREATE TABLE IF NOT EXISTS " + self.level_2_table_name + " (id INTEGER NOT NULL \
-                            PRIMARY KEY, author VARCHAR(64), media_type VARCHAR(64), synopsis CLOB, genre VARCHAR(64), language \
-                            VARCHAR(64), publisher VARCHAR(64), edition VARCHAR(64), isbn CHAR(13), illustrations \
-                            BOOLEAN, series_id INTEGER, position_in_series INTEGER, date published DATE)")
+                            PRIMARY KEY, author VARCHAR(64), media_type VARCHAR(64), synopsis CLOB, genre VARCHAR(64), \
+                            language VARCHAR(64), publisher VARCHAR(64), edition VARCHAR(64), isbn CHAR(13), \
+                            illustrations BOOLEAN, series_id INTEGER, position_in_series INTEGER, date published DATE)")
         self.connection.commit()
 
     """The add_book method below calls the add_product method from the ProductDatabase class to add a new record to the 
     product table, before also adding a new record to the book table with the same id."""
     def add_book(self, product_name, base_price, product_description, product_category, quantity_in_stock,
-                 product_image_url, date_added, price, quantity_sold, product_discount, author, media_type, synopsis, genre,
-                 language, publisher, edition, isbn, illustrations, series_id, position_in_series, date_published):
+                 product_image_url, date_added, price, quantity_sold, product_discount, author, media_type, synopsis,
+                 genre, language, publisher, edition, isbn, illustrations, series_id, position_in_series,
+                 date_published):
         super().add_product(product_name, base_price, product_description, product_category,
                             quantity_in_stock, product_image_url, date_added, price, quantity_sold, product_discount)
-        self.cursor.execute("INSERT INTO " + self.level_2_table_name + " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        self.cursor.execute("INSERT INTO " + self.level_2_table_name + " VALUES \
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                             ((super().get_new_id(self.level_1_table_name) - 1), author, media_type,
                              synopsis, genre, language, publisher, edition, isbn, illustrations, series_id,
                              position_in_series, date_published))
@@ -158,7 +167,7 @@ class ProductBookDatabase(ProductDatabase):
             self.cursor.execute("SELECT * FROM " + self.level_1_table_name + " INNER JOIN\
              " + self.level_2_table_name + " ON " + self.level_1_table_name + ".id=\
              " + self.level_2_table_name + ".id  WHERE " + self.level_1_table_name + ".id = ?",
-                            (self.SqlReader.convert_to_tuple(id)))
+                                (self.SqlReader.convert_to_tuple(id)))
             result = self.cursor.fetchall()
             return self.SqlReader.convert_from_tuple(result)
 
@@ -211,10 +220,11 @@ class ProductDigitalBookDatabase(ProductBookDatabase):
     It returns the joined record from the Product, ProductBook and ProductDigitalBook tables."""
     def get_record(self, id):
         try:
-            self.cursor.execute("SELECT * FROM " + self.level_1_table_name + " INNER JOIN " + self.level_2_table_name + " \
-            ON " + self.level_1_table_name + ".id=" + self.level_2_table_name + ".id INNER JOIN \
-            " + self.level_3_table_name + " ON " + self.level_1_table_name + ".id=" + self.level_3_table_name + ".id \
-            WHERE " + self.level_1_table_name + ".id = ?", (self.SqlReader.convert_to_tuple(id)))
+            self.cursor.execute("SELECT * FROM " + self.level_1_table_name + " INNER JOIN " + self.level_2_table_name
+                                + " ON " + self.level_1_table_name + ".id=" + self.level_2_table_name + ".id INNER \
+                                JOIN " + self.level_3_table_name + " ON " + self.level_1_table_name + ".id=" +
+                                self.level_3_table_name + ".id WHERE " + self.level_1_table_name + ".id = ?",
+                                (self.SqlReader.convert_to_tuple(id)))
             result = self.cursor.fetchall()
             return self.SqlReader.convert_from_tuple(result)
 
@@ -255,7 +265,8 @@ class ProductPhysicalBookDatabase(ProductBookDatabase):
     def add_physical_book(self, product_name, base_price, product_description, product_category, quantity_in_stock,
                           product_image_url, date_added, price, quantity_sold, product_discount, author, media_type,
                           synopsis, genre, language, publisher, edition, isbn, illustrations, series_id,
-                          position_in_series, date_published, product_condition, product_format, shipping_time, page_count):
+                          position_in_series, date_published, product_condition, product_format, shipping_time,
+                          page_count):
         super().add_book(product_name, base_price, product_description, product_category, quantity_in_stock,
                          product_image_url, date_added, price, quantity_sold, product_discount, author, media_type,
                          synopsis, genre, language, publisher, edition, isbn, illustrations, series_id,
@@ -266,13 +277,14 @@ class ProductPhysicalBookDatabase(ProductBookDatabase):
         self.connection.commit()
 
     """The get_record method below overwrites the get_record method from the Database class. 
-    It returns the joined record from the Product, ProductBook and ProductPhysicalBook tables."""
+    It returns the joined record from the Product, ProductBook and ProductPhysicalBook tables as a list."""
     def get_record(self, id):
         try:
-            self.cursor.execute("SELECT * FROM " + self.level_1_table_name + " INNER JOIN " + self.level_2_table_name + " \
-            ON " + self.level_1_table_name + ".id=" + self.level_2_table_name + ".id INNER JOIN \
-            " + self.level_3_table_name + " ON " + self.level_1_table_name + ".id=" + self.level_3_table_name + ".id \
-            WHERE " + self.level_1_table_name + ".id = ?", (self.SqlReader.convert_to_tuple(id)))
+            self.cursor.execute("SELECT * FROM " + self.level_1_table_name + " INNER JOIN " + self.level_2_table_name +
+                                " ON " + self.level_1_table_name + ".id=" + self.level_2_table_name + ".id INNER JOIN "
+                                + self.level_3_table_name + " ON " + self.level_1_table_name + ".id=" +
+                                self.level_3_table_name + ".id WHERE " + self.level_1_table_name + ".id = ?",
+                                (self.SqlReader.convert_to_tuple(id)))
             result = self.cursor.fetchall()
             return self.SqlReader.convert_from_tuple(result)
 
@@ -295,7 +307,7 @@ class AccountDatabase(Database):
 
     """The init method below stores the account table and password table names as attributes, before calling the
     superclass initialisation method on the account table. It then creates the account table (containing attributes:
-    id, username, email and permission_id) and password table (containing attributes: id and hashed_password).
+    id, username, email, salt and permission_id) and password table (containing attributes: id and hashed_password).
     Finally, it creates an AccountSecurity object, which inherits from database_utils.AccountSecurity, and stores
     methods for hashing passwords and comparing them to stored passwords."""
     def __init__(self, account_table_name, password_table_name):
@@ -303,24 +315,27 @@ class AccountDatabase(Database):
         self.password_table_name = password_table_name
         super().__init__(account_table_name)
         self.cursor.execute("CREATE TABLE IF NOT EXISTS " + self.account_table_name + " (id INTEGER NOT NULL \
-        PRIMARY KEY, username VARCHAR(64) NOT NULL, email VARCHAR(64), permission_id VARCHAR(16) NOT NULL, salt BLOB NOT NULL)")
+        PRIMARY KEY, username VARCHAR(64) NOT NULL, email VARCHAR(64), permission_id VARCHAR(16) NOT NULL, salt \
+        BLOB NOT NULL)")
         self.cursor.execute("CREATE TABLE IF NOT EXISTS " + self.password_table_name + " \
         (id INTEGER NOT NULL PRIMARY KEY, hashed_passwords VARCHAR(64) NOT NULL)")
         self.connection.commit()
         self.AccountSecurity = database_utils.AccountSecurity()
 
-    """The add_account method below inserts a new record into the account table and password table when called."""
+    """The add_account method below inserts a new record into the account table and password table when called. 
+    It calls functions from the AccountSecurity object to hash the password and generate a salt."""
     def add_account(self, username, email, permission_id, password):
         salt = self.AccountSecurity.generate_salt()
         self.cursor.execute("INSERT INTO " + self.table_name + " VALUES (?, ?, ?, ?, ?)",
-                            (super().get_new_id(self.account_table_name), username, email, permission_id, salt))
+                            (super().get_new_id(self.account_table_name), username, email, permission_id,
+                             salt))
         self.cursor.execute("INSERT INTO " + self.password_table_name + " VALUES (?, ?)",
                             (super().get_new_id(self.account_table_name) - 1,
                              self.AccountSecurity.hash_password(password, salt)))
         self.connection.commit()
 
     """The get_id_from_username method below takes a username as argument and returns the database id associated 
-    with that username."""
+    with that username as a list with a single element."""
     def get_id_from_username(self, username):
         self.cursor.execute("SELECT id FROM " + self.account_table_name + " WHERE username = ?",
                             (self.SqlReader.convert_to_tuple(username)))
@@ -339,9 +354,11 @@ class AccountDatabase(Database):
     """The compare_passwords method below takes a password and id as arguments and returns True only if the hashed and 
     salted password argument matches the stored hashed_password in the password table."""
     def compare_passwords(self, password, id):
-        stored_password = self.cursor.execute("SELECT hashed_passwords FROM " + self.password_table_name + " WHERE id = ?", self.SqlReader.convert_to_tuple(id))
+        stored_password = self.cursor.execute("SELECT hashed_passwords FROM " + self.password_table_name + " \
+        WHERE id = ?", self.SqlReader.convert_to_tuple(id))
         stored_password = bytes(stored_password.fetchone()[0])
-        salt = self.cursor.execute("SELECT salt FROM " + self.account_table_name + " WHERE id = ?", self.SqlReader.convert_to_tuple(id))
+        salt = self.cursor.execute("SELECT salt FROM " + self.account_table_name + " WHERE id = ?",
+                                   self.SqlReader.convert_to_tuple(id))
         salt = bytes(salt.fetchone()[0])
         if stored_password == self.AccountSecurity.hash_password(password, salt):
             return True
@@ -405,15 +422,15 @@ class ReviewDatabase(Database):
         self.review_table_name = review_table_name
         super().__init__(review_table_name)
         self.cursor.execute("CREATE TABLE IF NOT EXISTS " + self.review_table_name + " (id INTEGER NOT NULL \
-        PRIMARY KEY, product_id INTEGER NOT NULL, account_id INTEGER NOT NULL, review_header VARCHAR(64), review_text CLOB, review_rating INTEGER \
-        NOT NULL, review_date DATE)")
+        PRIMARY KEY, product_id INTEGER NOT NULL, account_id INTEGER NOT NULL, review_header VARCHAR(64), review_text \
+        CLOB, review_rating INTEGER NOT NULL, review_date DATE)")
         self.connection.commit()
 
     """The add_review method inserts a new record into the review_table when called."""
     def add_review(self, product_id, account_id, review_header, review_text, review_rating, datetime):
         self.cursor.execute("INSERT INTO " + self.review_table_name + " VALUES (?, ?, ?, ?, ?, ?, ?)",
-                            (self.get_new_id(self.review_table_name), product_id, account_id, review_header, review_text,
-                             review_rating, datetime))
+                            (self.get_new_id(self.review_table_name), product_id, account_id,
+                             review_header, review_text, review_rating, datetime))
         self.connection.commit()
 
 
@@ -448,40 +465,9 @@ class ProductListItemsDatabase(Database):
         NOT NULL PRIMARY KEY, product_list_id INTEGER NOT NULL, product_id INTEGER NOT NULL)")
         self.connection.commit()
 
+    """'add_product_to_list' adds a product to a specified list when called."""
     def add_product_to_list(self, product_list_id, product_id):
         self.cursor.execute("INSERT INTO " + self.product_list_items_table_name + " VALUES(?,?,?)",
                             (self.get_new_id(self.product_list_items_table_name), product_list_id,
                              product_id))
         self.connection.commit()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

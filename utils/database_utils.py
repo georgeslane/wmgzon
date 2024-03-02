@@ -1,6 +1,8 @@
 import bcrypt
 import random
 import string
+"""The SqliteReader class contains methods to convert between datatypes used in an sqlite database and datatypes that 
+are easier to work with, such as lists."""
 class SqliteReader():
 
     """The method below converts any single value input into a tuple of size 1"""
@@ -8,7 +10,7 @@ class SqliteReader():
         return (input,)
 
     """The method below converts any tuple of size n stored inside a list of size 1 into a list of size n, with each 
-    element of the list coresponding to an element of the tuple."""
+    element of the list corresponding to an element of the tuple."""
     def convert_from_tuple(self, input):
         try:
             input = list(input[0])
@@ -33,9 +35,7 @@ class SqliteReader():
             output_nested_list.append(list(tuple))
         return output_nested_list
 
-
-
-
+"""The AccountSecurity class contains methods to hash and salt passwords."""
 class AccountSecurity():
 
     """The following method takes a password input and a salt input, combines inputs and hashes the combined string
@@ -46,6 +46,7 @@ class AccountSecurity():
             password = bcrypt.hashpw(password=password, salt=salt)
         return password
 
+    """Generates a salt using the bcrypt.gensalt function."""
     def generate_salt(self):
           return bcrypt.gensalt()
 

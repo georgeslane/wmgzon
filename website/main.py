@@ -3,31 +3,33 @@ from flask_login import LoginManager, UserMixin, login_user, logout_user, login_
 from website import database_object_initialisation as db
 import secrets
 
-
+# Sets up the flask login manager and secret key.
 app = Flask(__name__)
 app.config['SECRET_KEY'] = secrets.token_hex(64)
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
 
+# Redirects unauthenticated users to login when they try to access a page that requires authentication.
 @login_manager.unauthorized_handler
 def unauthorized_callback():
     if 'login' not in request.path:
         session['next_url'] = request.path
     return redirect(url_for('login'))
 
+# Loads the user from the session.
 @login_manager.user_loader
 def load_user(user_id):
     user = UserMixin()
     user.id = user_id
     return user
 
-
+# Home page route.
 @app.route('/')
 def home():
     return render_template('home_page.html')
 
-
+# Routes to the product page with the product id as a parameter.
 @app.route('/product/<int:id>')
 def product(id):
    """Creares a dictionary of product page info with the following keys: 'reviews', 'matching_author_products', 'matching_genre_products' , 'product_data' (storing the home product data) and 'category'"""
@@ -37,10 +39,9 @@ def product(id):
    db.ProductBookFunctions.view_similar_author(id, product_dictionary)
    db.ProductBookFunctions.view_similar_genre(id, product_dictionary)
    session['product_id'] = id
-
    return render_template('product_page.html', product=product_dictionary)
 
-
+# Routes to the search page
 @app.route('/search', methods=['POST'])
 def search():
    """Creates a dictionary with two keys: 'search_results' and 'average_ratings'."""
@@ -49,10 +50,9 @@ def search():
    db.SearchFunctions.search_products(search_string, search_dict)
    db.SearchFunctions.get_average_rating(search_dict['search_results'], search_dict)
    db.SearchFunctions.get_unique_values_from_search(search_dict, search_dict['search_results'])
-
    return render_template('search_page.html', search_results=search_dict)
 
-
+# Routes to login. After login, users are redirected to the page they were trying to access before logging in.
 @app.route('/login', methods=['GET', 'POST'])
 def login():
    if request.method == 'POST':
@@ -72,12 +72,13 @@ def login():
         return 'Invalid username or password'
    return render_template('login_page.html')
 
+# Logs the user out and redirects them to the home page.
 @app.route('/logout')
 def logout():
     logout_user()
     return redirect(url_for('home'))
 
-
+# Routes to the register page.
 @app.route('/register', methods=['GET', 'POST'])
 def register():
    if request.method == 'POST':
@@ -91,7 +92,7 @@ def register():
         return redirect(url_for('login'))
    return render_template('register_page.html')
 
-
+# Routes to the account page. Loads different pages depending on the user's permission level.
 @app.route('/account', methods=['GET', 'POST'])
 @login_required
 def account():
@@ -100,17 +101,21 @@ def account():
         admin_info['username'] = session['username']
         admin_info['search_results'] = db.Product.get_all_products(db.ProductBook.level_2_table_name)
         if request.method == 'POST':
+            # Allows admins to search for products
             if 'search_string' in request.form:
                 search_string = request.form['search_string']
                 db.SearchFunctions.search_products(search_string, admin_info)
+            # Allows admins to update product discounts
             elif 'discount' in request.form:
                 discount = request.form['discount']
                 product_id = request.form['product_id']
                 db.ProductFunctions.discount_price(product_id, float(discount))
+            # Allows admins to update product stock levels
             elif 'stock' in request.form:
                 stock = request.form['stock']
                 product_id = request.form['product_id']
                 db.ProductFunctions.restock_product(product_id, stock)
+            # Allows admins to add new products
             elif 'add_product' in request.form:
                 name = request.form['product_name']
                 price = request.form['product_price']
@@ -136,11 +141,13 @@ def account():
             return redirect(url_for('account'))
         return render_template('admin_account_page.html', admin_info=admin_info)
     else:
+        # Loads customer payment and delivery method data.
         customer_info = {}
         db.PaymentMethodFunctions.get_payment_methods_for_account(session['account_id'], customer_info)
         db.DeliveryMethodFunctions.get_delivery_methods_for_account(session['account_id'], customer_info)
         customer_info['username'] = session['username']
         if request.method == 'POST':
+            # Allows customers to add new payment method.
             if 'card_number' in request.form:
                 card_number = request.form['card_number']
                 expiry_date = request.form['expiry_date']
@@ -148,7 +155,9 @@ def account():
                 card_name = request.form['cardholder_name']
                 bank = request.form['card_provider']
                 billing_address = request.form['billing_address']
-                db.PaymentMethod.add_payment_method(session['account_id'], card_number, cvv, card_name, expiry_date, billing_address, bank)
+                db.PaymentMethod.add_payment_method(session['account_id'], card_number, cvv, card_name, expiry_date,
+                                                    billing_address, bank)
+            # Allows customers to add new delivery method.
             elif 'postcode' in request.form:
                 line_1 = request.form['address_line_1']
                 line_2 = request.form['address_line_2']
@@ -156,9 +165,11 @@ def account():
                 postcode = request.form['postcode']
                 city = request.form['city']
                 country = request.form['address_country']
-                db.DeliveryMethod.add_delivery_method(session['account_id'], line_1, line_2, line_3, city, country, postcode)
+                db.DeliveryMethod.add_delivery_method(session['account_id'], line_1, line_2, line_3, city, country,
+                                                      postcode)
         return render_template('customer_account_page.html', customer_info=customer_info)
 
+#The delete_product page deletes a product before redirecting to the account page.
 @app.route('/delete_product/<int:product_id>', methods=['POST'])
 def delete_product(product_id):
     if UserMixin.is_authenticated:
@@ -179,10 +190,7 @@ def delete_product(product_id):
     else:
         return redirect(url_for('login'))
 
-
-
-
-
+# delete_card deletes a card before redirecting to the account page.
 @app.route('/delete_card/<int:card_id>', methods=['POST'])
 def delete_card(card_id):
     if UserMixin.is_authenticated:
@@ -191,6 +199,7 @@ def delete_card(card_id):
     else:
         return redirect(url_for('login'))
 
+# delete_address deletes an address before redirecting to the account page.
 @app.route('/delete_address/<int:address_id>', methods=['POST'])
 def delete_address(address_id):
     if UserMixin.is_authenticated:
@@ -199,13 +208,13 @@ def delete_address(address_id):
     else:
         return redirect(url_for('login'))
 
-
+# Routes to the basket page.
 @app.route('/basket')
 @login_required
 def basket():
    return render_template('basket_page.html')
 
-
+# Routes to the review page, allowing users to add a review to a product.
 @app.route('/review', methods=['POST', 'GET'])
 @login_required
 def review():
@@ -218,9 +227,6 @@ def review():
         db.ReviewFunctions.add_review(product_id, account_id, review_heading, review_text, rating)
         return redirect(url_for('product', id=product_id))
     return render_template('review_page.html')
-
-
-
 
 if __name__ == '__main__':
    app.run(debug=True)
