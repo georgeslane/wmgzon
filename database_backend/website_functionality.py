@@ -152,10 +152,55 @@ class Review:
         for id in review_ids:
             db_tables.Review.get_record(id)
 
+class Account:
+    """'add_account' adds a new account to the database, if it is a customer account, a basket is also added to the
+    product list table."""
+    def add_account(self, username, email, account_type, password):
+        if account_type == 'ADMIN':
+            db_tables.Account.add_account(username, email, 'ADMIN', password)
+        elif account_type == 'CUST':
+            db_tables.Account.add_account(username, email, 'CUST', password)
+            id = db_tables.Account.get_id_from_username(username)[0]
+            db_tables.ProductList.add_product_list(id, 'BASKET', 'Basket', 'Shopping basket')
+        else:
+            return 'Invalid account type'
+
 class ProductList:
     pass
 class Basket(ProductList):
-    """Inherits from ProductList. Contains method: purchase_basket"""
+
+    """Adds a given product to a users basket"""
+    def add_to_basket(self, account_id, product_id):
+        basket_id = db_tables.ProductList.get_basket(account_id)[0]
+        db_tables.ProductListItems.add_product_to_list(basket_id, product_id)
+
+    """Gets all the products in a users basket, outputs as a dictionary containing a nested list."""
+    def get_basket(self, account_id, dictionary):
+        products_in_basket = []
+        basket_id = db_tables.ProductList.get_basket(account_id)[0]
+        basket_items = db_tables.ProductListItems.get_id_from_any_column(
+            db_tables.ProductListItems.product_list_items_table_name, 'product_list_id', basket_id)
+        for product in basket_items:
+            product_id = db_tables.ProductListItems.get_record_value(
+                db_tables.ProductListItems.product_list_items_table_name, product, 'product_id')[0]
+            products_in_basket.append(db_tables.Product.get_record(product_id))
+        dictionary['basket'] = products_in_basket
+        return dictionary
+
+    """Purchases a product from a users basket, then increments stock levels in the database."""
+    def purchase_from_basket(self, account_id, product_id):
+        basket_id = db_tables.ProductList.get_basket(account_id)[0]
+        basket_product_id = db_tables.ProductListItems.get_id_for_list_item(basket_id, product_id)[0]
+        db_tables.ProductListItems.delete_record(basket_product_id)
+        db_tables.ProductFunctions.purchase_increment_stock(product_id)
+
+    """Removes a product from a users basket."""
+    def delete_from_basket(self, account_id, product_id):
+        basket_id = db_tables.ProductList.get_basket(account_id)[0]
+        basket_product_id = db_tables.ProductListItems.get_id_for_list_item(basket_id, product_id)[0]
+        db_tables.ProductListItems.delete_record(basket_product_id)
+
+
 
 class PaymentMethod:
     """Gets all payment methods for a specific account. Outputs as a dictionary containing a nested list."""

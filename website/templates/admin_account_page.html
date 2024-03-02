@@ -66,7 +66,7 @@
             <td class="table_data"><input type="text" name="discount" placeholder="Apply discount" value="{{request.form.discount}}"></td>
             <input type="submit" name="update_stock" value="Update stock" hidden>
         </form>
-        <form action="{{url_for('delete_product', product_id = product[0])}}" method="post"><td class="table_data"><input type="submit" name="delete_product" placeholder="Delete product" value="{{request.form.delete}}"></td></form>
+        <form action="{{url_for('delete_product', product_id = product[0])}}" method="post"><td class="table_data"><button type="submit" name="delete_product" value="{{request.form.delete}}">Delete</button></td></form>
     </tr>
     {% endfor %}
 </table>
@@ -132,7 +132,7 @@
 
     new Chart(price_ctx, {
         type: "bar",
-        data: { labels: product_names, datasets: [{ label: "Most sold products", data: product_prices, backgroundColor: ["#3e95cd", "#8e5ea2","#3cba9f","#e8c3b9","#c45850"] }]},
+        data: { labels: product_names, datasets: [{ label: "Products by price", data: product_prices, backgroundColor: ["#3e95cd", "#8e5ea2","#3cba9f","#e8c3b9","#c45850"] }]},
         options: {}
     });
 </script>

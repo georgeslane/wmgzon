@@ -30,7 +30,7 @@ def home():
     return render_template('home_page.html')
 
 # Routes to the product page with the product id as a parameter.
-@app.route('/product/<int:id>')
+@app.route('/product/<int:id>', methods=['GET', 'POST'])
 def product(id):
    """Creares a dictionary of product page info with the following keys: 'reviews', 'matching_author_products', 'matching_genre_products' , 'product_data' (storing the home product data) and 'category'"""
    product_dictionary = {}
@@ -39,6 +39,11 @@ def product(id):
    db.ProductBookFunctions.view_similar_author(id, product_dictionary)
    db.ProductBookFunctions.view_similar_genre(id, product_dictionary)
    session['product_id'] = id
+   if request.method == 'POST' and 'account_id' in session:
+       product_id = session['product_id']
+       db.BasketFunctions.add_to_basket(session['account_id'], product_id)
+   elif request.method == 'POST' and 'account_id' not in session:
+       return redirect(url_for('login'))
    return render_template('product_page.html', product=product_dictionary)
 
 # Routes to the search page
@@ -84,11 +89,13 @@ def register():
    if request.method == 'POST':
       if request.form['password'] != request.form['confirm_password']:
          return 'Passwords do not match'
+      elif len(request.form['password']) < 8:
+            return 'Password must be at least 8 characters'
       else:
         username = request.form['username']
         password = request.form['password']
         email = request.form['email']
-        db.Account.add_account(username, email, "CUST", password)
+        db.AccountFunctions.add_account(username, email, "CUST", password)
         return redirect(url_for('login'))
    return render_template('register_page.html')
 
@@ -209,10 +216,20 @@ def delete_address(address_id):
         return redirect(url_for('login'))
 
 # Routes to the basket page.
-@app.route('/basket')
+@app.route('/basket', methods=['POST', 'GET'])
 @login_required
 def basket():
-   return render_template('basket_page.html')
+    basket = {}
+    account_id = session['account_id']
+    db.BasketFunctions.get_basket(account_id, basket)
+    if request.method == 'POST':
+        if 'remove' in request.form:
+            product_id = request.form['remove']
+            db.BasketFunctions.delete_from_basket(account_id, product_id)
+        elif 'purchase' in request.form:
+            product_id = request.form['purchase']
+            db.BasketFunctions.purchase_from_basket(account_id, product_id)
+    return render_template('basket_page.html', basket=basket)
 
 # Routes to the review page, allowing users to add a review to a product.
 @app.route('/review', methods=['POST', 'GET'])

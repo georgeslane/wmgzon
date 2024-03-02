@@ -453,6 +453,14 @@ class ProductListDatabase(Database):
                              list_name, list_description))
         self.connection.commit()
 
+    """Gets a customers basket id and returns as a list with a single element."""
+    def get_basket(self, account_id):
+        self.cursor.execute("SELECT id FROM " + self.product_list_table_name + " WHERE account_id = ? AND list_type \
+        = 'BASKET'", (self.SqlReader.convert_to_tuple(account_id)))
+        id = self.cursor.fetchall()
+        id = self.SqlReader.convert_from_tuple(id)
+        return id
+
 
 class ProductListItemsDatabase(Database):
 
@@ -471,3 +479,11 @@ class ProductListItemsDatabase(Database):
                             (self.get_new_id(self.product_list_items_table_name), product_list_id,
                              product_id))
         self.connection.commit()
+
+    """Gets id for a product in a users basket."""
+    def get_id_for_list_item(self, product_list_id, product_id):
+        self.cursor.execute("SELECT id FROM " + self.product_list_items_table_name + " WHERE product_list_id = ? \
+        AND product_id = ?", (product_list_id, product_id))
+        id = self.cursor.fetchall()
+        id = self.SqlReader.convert_from_tuple(id)
+        return id

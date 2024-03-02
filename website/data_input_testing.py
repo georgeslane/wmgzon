@@ -25,4 +25,9 @@ db.Account.add_account('kneecy', 'neece@coolmail.com', 'CUST', 'cute')
 # db.PaymentMethod.add_payment_method('2', 1233321234566789, 234, 'George', '2023-07-10', '78 moon rd', 'Chase')
 
 
-db.ProductBook.update_record(db.ProductBook.level_2_table_name, 6, 'media_type', 'praperback')
+# db.ProductBook.update_record(db.ProductBook.level_2_table_name, 6, 'media_type', 'praperback')
+# dictionary = {}
+# db.BasketFunctions.get_basket(5, dictionary)
+# print(dictionary['basket'])
+
+print(db.ProductListItems.get_id_from_any_column(db.ProductListItems.product_list_items_table_name, 'product_list_id', 1))

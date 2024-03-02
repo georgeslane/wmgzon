@@ -7,7 +7,7 @@
     <link rel="stylesheet" type="text/css" href="../static/stylesheets/website_header.css"/>
     <title>Basket</title>
 </head>
-<body id="product_page_format">
+<body id="page_format">
 <!-- The header bar below contains the logo, search bar, and account and basket links and should be used globally across the site -->
 <div class ='header_bar'>
     <a href="/" class ='header_bar_elements'><img id="header_bar_logo" src="../static/images/wmgzon_logo.png" alt="WMGzon logo"/> </a>
@@ -27,6 +27,28 @@
     <a class="category_bar_elements" style="background: rgba(241,224,86,0.5)" href="/jewellery_page.html">Jewellery</a>
     <a class="category_bar_elements" style="background: rgba(146,241,225,0.5)" href="/movies_page.html">Movies</a>
 </div>
+{%if basket['basket'] == []%}
+    <h1>Your basket is empty</h1>
+{%endif%}
+{%for product in basket['basket']%}
+<div class="product_module">
+    <img class="product_image" src="{{product[6]}}" alt="{{product[2]}}" />
+    <div>
+        <h4>{{product[1]}}: {{product[3]}}</h4>
+        <h4>Price: £{{product[8]}}</h4>
+    </div>
+    <div>
+        <form class ="basket_form" action="" method="post">
+            <button class="buttons" type="submit" value="{{product[0]}}" name="remove">Remove product</button>
+            <button class="buttons" type="submit" name="purchase" value="{{product[0]}}">Purchase product</button>
+        </form>
+    </div>
+
+
+
+</div>
+{%endfor%}
+
 
 </body>
 </html>

@@ -1,0 +1,28 @@
+#page_format{
+    background: rgb(241, 160, 111, 20%);
+    opacity: 100%;
+}
+
+div.product_module{
+    width: 60%;
+    margin-left: 20%;
+    margin-top: 5%;
+    margin-right: 20%;
+    display: inline-flex;
+    border: solid black 1px;
+}
+
+img.product_image{
+    height: 300px;
+    width: auto;
+}
+
+form.basket_form{
+    display: block;
+}
+
+.buttons{
+    display: block;
+    width: 100%;
+    margin: 50%;
+}
