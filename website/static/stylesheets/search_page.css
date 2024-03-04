@@ -25,9 +25,9 @@
 
 div.search_result_module{
     height: 275px;
-    width: 320px;
+    width: 350px;
     border: solid black 1px;
-    margin: 30px;
+    margin: 10px;
     display: flex;
     background: rgba(161, 224, 238, 0.1);
     opacity: 100%;

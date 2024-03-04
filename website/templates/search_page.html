@@ -45,18 +45,6 @@
 
 </div>
 
-
-
-
-
-
-
-
-
-
-
-
-
 </body>
 <script>
     let search_results = JSON.parse('{{search_results|tojson|safe}}');
@@ -68,7 +56,7 @@
     unique_media_types = search_results.unique_media_types;
 
 
-
+    //Dynamically updates search results based on the filters selected
     function display_search_results(search_results){
         let search_results_divide = document.getElementById("search_results");
         let counter = 0;
@@ -98,19 +86,16 @@
             search_result_module.appendChild(search_result_image);
             search_result_module.appendChild(search_result_attributes);
             search_result_attributes.appendChild(search_result_title);
-            search_result_attributes.appendChild(document.createElement('br'));
             search_result_attributes.appendChild(search_result_price);
-            search_result_attributes.appendChild(document.createElement('br'));
             search_result_attributes.appendChild(search_result_stock);
-            search_result_attributes.appendChild(document.createElement('br'));
             search_result_attributes.appendChild(search_result_category);
-            search_result_attributes.appendChild(document.createElement('br'));
             search_result_attributes.appendChild(search_result_rating);
             display_rating(average_ratings[counter][1], search_result_rating);
             counter += 1;
         }
     }
 
+    //Displays filters for products on the search page
     function display_filters(unique_list, list_heading){
         let filter_form = document.createElement('div');
         filter_form.classList.add('filter_form');
@@ -134,49 +119,8 @@
         }
     }
 
-    function checkbox_listener(search_items, filter_name, filter_value){
-        updated_search_items = [];
-        if(filter_name === "Genre") {
-            for (let item of search_items){
-                if (item[10] === filter_value) {
-                    updated_search_items.push(item);
-                }
-            }
-        }
-                else if(filter_name === "Category") {
-            for (let item of search_items) {
-                if (item[4] === filter_value) {
-                    updated_search_items.push(item);
-                }
-            }
-        }
-        else if(filter_name === "Authors") {
-            for (let item of search_items) {
-                if (item[8] === filter_value) {
-                    updated_search_items.push(item);
-                }
-            }
-        }
-        else if(filter_name === "Media types") {
-            for (let item of search_items) {
-                if (item[9] === filter_value) {
-                    updated_search_items.push(item);
-                }
-            }
-        }
-        else if(filter_name === "Languages") {
-            for (let item of search_items) {
-                if (item[11] === filter_value) {
-                    updated_search_items.push(item);
-                }
-            }
-        }
-        search_items = updated_search_items;
-        display_search_results(search_items);
 
-    }
-
-
+    //Displays the rating of a product on the search page
     function display_rating(average_rating, parent_element){
         for (let i = 1; i <= average_rating; i++){
             let star = document.createElement('img');

@@ -100,7 +100,8 @@ div.review_pair{
 }
 
 div.review_sub_divide{
-    width:50%;
+    width:45%;
+    margin-right: 5%
 }
 
 /*Sets attributes for the product spec table, such as table layout, etc*/
