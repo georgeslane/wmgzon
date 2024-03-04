@@ -17,7 +17,11 @@ The main repository contains the following folders:
 - utils contains the file utils.py, which contains methods used to hash passwords and convert inputs to and from tuples. The methods here are used in the backend of the website.
 - website contains all files and folders used to run the web application, including html templates, css stylesheets and the main.py web app. It also contains the file which initialises database objects.
 
+# How to run tests:
+To run unit tests, navigate to the 'unit_tests' folder and run the test_database.py and test_website_functionality.py files. These files contain unit tests for some of the class methods in the database.
 # How to run:
 To run the website, simply navigate to the 'containerised_application' docker image and run the file. Then, navigate to 'http://127.0.0.1:5000' in your web browser.
+
+
 
 
