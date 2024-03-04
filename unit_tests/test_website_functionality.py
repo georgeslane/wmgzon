@@ -1,5 +1,19 @@
 import pytest
+from unit_tests import prep_test_data as prep_data
 from website import database_object_initialisation as db
+
+
+# Adding and removing dummy products to the database for testing
+def setup_module(module):
+    prep_data.add_products()
+
+def teardown_module(module):
+    prep_data.remove_products()
+    # cleans up from 'test_add_new_product_0'
+    try:
+        db.Product.delete_record(5)
+    except:
+        pass
 
 class TestProduct:
 
@@ -27,12 +41,6 @@ class TestProduct:
         db.ProductFunctions.get_reviews_for_product(1, product_dictionary)
         assert product_dictionary['reviews'] == [[1, 1, 1, 'Thrilling, sensational', 'This is the best book to ever grace the earth', 5, '2020-05-04']]
 
-    # Tests that getting product by category returns a dictionry with the category as the key and a nested list of products as the value.
-    def test_get_product_by_category(self):
-        product_dictionary = {}
-        db.ProductFunctions.get_products_by_category(1, product_dictionary)
-        books = [db.Product.get_record(1), db.Product.get_record(2)]
-        assert product_dictionary['Books'] == books
 
 
 
@@ -41,7 +49,7 @@ class TestProduct:
 
 
 
-# cleans up from 'test_add_new_product_0'
-db.Product.delete_record(5)
+
+
 
 

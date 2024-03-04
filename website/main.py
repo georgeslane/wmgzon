@@ -32,13 +32,19 @@ def home():
 # Routes to the product page with the product id as a parameter.
 @app.route('/product/<int:id>', methods=['GET', 'POST'])
 def product(id):
-   """Creares a dictionary of product page info with the following keys: 'reviews', 'matching_author_products', 'matching_genre_products' , 'product_data' (storing the home product data) and 'category'"""
+   """Creares a dictionary of product page info with the following keys: 'reviews', 'matching_author_products',
+   'matching_genre_products' , 'product_data' (storing the home product data) and 'category'"""
    product_dictionary = {}
+   # Gets product data
    db.ProductFunctions.get_full_product(id, product_dictionary)
+   # Gets product reviews
    db.ProductFunctions.get_reviews_for_product(id, product_dictionary)
+   #Gets products by the same author
    db.ProductBookFunctions.view_similar_author(id, product_dictionary)
+   # Gets products in the same genre
    db.ProductBookFunctions.view_similar_genre(id, product_dictionary)
    session['product_id'] = id
+   # Adds product to basket if user is logged in
    if request.method == 'POST' and 'account_id' in session:
        product_id = session['product_id']
        db.BasketFunctions.add_to_basket(session['account_id'], product_id)

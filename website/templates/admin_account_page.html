@@ -124,7 +124,8 @@
 
     new Chart(sales_ctx, {
         type: "bar",
-        data: { labels: product_names, datasets: [{ label: "Most sold products", data: product_quantities, backgroundColor: ["#3e95cd", "#8e5ea2","#3cba9f","#e8c3b9","#c45850"] }]},
+        data: { labels: product_names, datasets: [{ label: "Most sold products", data: product_quantities,
+                backgroundColor: ["#3e95cd", "#8e5ea2","#3cba9f","#e8c3b9","#c45850"] }]},
         options: {}
     });
 
@@ -132,7 +133,8 @@
 
     new Chart(price_ctx, {
         type: "bar",
-        data: { labels: product_names, datasets: [{ label: "Products by price", data: product_prices, backgroundColor: ["#3e95cd", "#8e5ea2","#3cba9f","#e8c3b9","#c45850"] }]},
+        data: { labels: product_names, datasets: [{ label: "Products by price", data: product_prices, backgroundColor:
+                    ["#3e95cd", "#8e5ea2","#3cba9f","#e8c3b9","#c45850"] }]},
         options: {}
     });
 </script>
