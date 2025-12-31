@@ -21,6 +21,14 @@ The main repository contains the following folders:
 To run unit tests, navigate to the 'unit_tests' folder and run the test_database.py and test_website_functionality.py files. These files contain unit tests for some of the class methods in the database.
 # How to run:
 To run the website, simply navigate to the 'containerised_application' docker image and run the file. Then, navigate to 'http://127.0.0.1:5000' in your web browser.
+To login, use the following credentials: 
+Admin login:
+- Username: donald_duck
+- Password: password
+
+User login:
+- Username: micky_mouse
+- Password: qwerty12345
 
 
 
